@@ -6,6 +6,7 @@ class WarehouseIndividual(IntVectorIndividual):
         super().__init__(problem, num_genes)
         # TODO
 
+
     def compute_fitness(self) -> float:
         # TODO
         return 0

@@ -618,6 +618,7 @@ class SearchSolver(threading.Thread):
         self.agent.stop()
 
     def run(self):
+
         # TODO calculate pairs distances
 
 

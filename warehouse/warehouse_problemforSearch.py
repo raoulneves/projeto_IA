@@ -27,6 +27,5 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
         return successor
 
     def is_goal(self, state: WarehouseState) -> bool:
-        # TODO
-        pass
-
+        # Verifies if the agent is in the goal position
+        return state == self.goal_position
