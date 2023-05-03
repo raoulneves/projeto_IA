@@ -27,6 +27,9 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
         return successor
 
     def is_goal(self, state: WarehouseState) -> bool:
-        # TODO
-        pass
+        # Verifies if the agent is in the goal position
+        return state == self.goal_position
 
+    # This method assumes that the tiles in the goal state are ordered from top to bottom, from left to right.
+    def compute_path_cost(self, path: list) -> int:
+        return len(path)
