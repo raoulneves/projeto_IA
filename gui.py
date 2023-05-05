@@ -18,9 +18,12 @@ from ga.genetic_operators.recombination2 import Recombination2
 from ga.genetic_operators.recombination_pmx import RecombinationPMX
 from ga.genetic_operators.mutation_insert import MutationInsert
 from ga.genetic_algorithm_thread import GeneticAlgorithmThread
+from search_methods.astar_search import AStarSearch
+from warehouse.heuristic_warehouse import HeuristicWarehouse
 from warehouse.warehouse_agent_search import WarehouseAgentSearch, read_state_from_txt_file
 from warehouse.warehouse_experiments_factory import WarehouseExperimentsFactory
 from warehouse.warehouse_problemforGA import WarehouseProblemGA
+from warehouse.warehouse_problemforSearch import WarehouseProblemSearch
 from warehouse.warehouse_state import WarehouseState
 
 matplotlib.use("TkAgg")
@@ -285,7 +288,7 @@ class Window(tk.Tk):
 
     def runSearch_button_clicked(self):
 
-        self.agent_search.search_method.stopped=False
+        self.agent_search.search_method.stopped = False
 
         self.text_problem.delete("1.0", "end")
 
@@ -369,7 +372,7 @@ class Window(tk.Tk):
             if done:
                 self.queue.queue.clear()
                 self.after_cancel(self.after_id)
-                self.after_id= None
+                self.after_id = None
                 self.solution_runner = None
                 self.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                     open_experiments=tk.NORMAL, run_experiments=tk.DISABLED,
@@ -408,7 +411,6 @@ class Window(tk.Tk):
             self.solver = None
             return
 
-
         if self.solution_runner is not None and self.solution_runner.thread_running:
             self.solution_runner.stop()
             self.queue.queue.clear()
@@ -429,9 +431,6 @@ class Window(tk.Tk):
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
                                 simulation=tk.DISABLED, stop_simulation=tk.DISABLED)
             self.genetic_algorithm = None
-
-
-
 
     def open_experiments_button_clicked(self):
         filename = fd.askopenfilename(initialdir='.')
@@ -620,9 +619,45 @@ class SearchSolver(threading.Thread):
     def run(self):
 
         # TODO calculate pairs distances
-        
+        # Create an instance of the AStarSearch class
 
-        self.agent.search_method.stopped=True
+        a_star_search = AStarSearch()
+
+        # Initialize an empty dictionary to store the distances between pairs
+        pair_distances = {}
+
+        # Loop through each pair in the agent's pairs list
+        for pair in self.agent.pairs:
+            # Get the coordinates of the pair's starting and ending points
+            start = pair.cell1
+            end = pair.cell2
+
+            # Create the initial state based on the agent's environment
+            initial_state = WarehouseState(self.agent.initial_environment.matrix,
+                                           self.agent.initial_environment.rows,
+                                           self.agent.initial_environment.columns)
+
+            # Set the forklift's position to the starting point of the pair
+            initial_state.line_forklift, initial_state.column_forklift = start.line, start.column
+
+            # Create a WarehouseProblemSearch instance with the goal position set to the end point of the pair
+            problem = WarehouseProblemSearch(initial_state, end)
+            problem.heuristic = HeuristicWarehouse()
+
+            # Run the A* search algorithm to find the shortest path
+            solution = a_star_search.search(problem)
+
+            if solution is not None:
+                # Calculate the distance between the pair's points based on the solution's path
+                distance = len(solution.actions)
+
+                # Store the distance in the pair_distances dictionary with the pair as the key
+                pair_distances[pair] = distance
+                print("PAIR: ", pair,"DISTANCE: ", pair_distances[pair])
+
+
+
+        self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
         self.gui.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
@@ -668,4 +703,3 @@ class SolutionRunner(threading.Thread):
                 # TODO put the catched products in black
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
         self.gui.queue.put((None, steps, True))  # Done
-

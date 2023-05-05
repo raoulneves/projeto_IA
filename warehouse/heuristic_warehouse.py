@@ -10,8 +10,12 @@ class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
 
     def compute(self, state: WarehouseState) -> float:
         # TODO
-        pass
+        forklift_pos = (state.line_forklift, state.column_forklift)
+        exit_pos = (state.line_exit, state.column_exit)
 
+        heuristic_value = abs(forklift_pos[0] - exit_pos[0]) + abs(forklift_pos[1] - exit_pos[1])
+
+        return 1
     def __str__(self):
-        return "# TODO"
+        return "HeuristicWarehouse"
 

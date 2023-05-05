@@ -13,6 +13,7 @@ class WarehouseState(State[Action]):
         super().__init__()
         # TODO
 
+
         self.rows = rows
         self.columns = columns
         self.matrix = np.full([self.rows, self.columns], fill_value=0, dtype=int)

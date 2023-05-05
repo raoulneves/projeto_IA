@@ -40,10 +40,16 @@ class GraphSearch(SearchMethod, Generic[T]):
         self._frontier.append(Node(problem.initial_state))
 
         while len(self._frontier) != 0 and not self.stopped:
+            #print("-----------------------------------")
             node = self._frontier.pop()
             state = node.state
+            #print("State: ", state)
+            #print("Node: ", node)
+
             if problem.is_goal(state):
                 return Solution(problem, node)
+
+
             self._explored.add(state)
             actions = problem.get_actions(state)
             for action in actions:
