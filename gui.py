@@ -303,6 +303,7 @@ class Window(tk.Tk):
         self.solver = SearchSolver(self, self.agent_search)
         self.solver.daemon = True
         self.solver.start()
+        self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
 
     def runGA_button_clicked(self):
 
@@ -647,15 +648,22 @@ class SearchSolver(threading.Thread):
             # Run the A* search algorithm to find the shortest path
             solution = a_star_search.search(problem)
 
+
             if solution is not None:
                 # Calculate the distance between the pair's points based on the solution's path
                 distance = len(solution.actions)
-
                 # Store the distance in the pair_distances dictionary with the pair as the key
                 pair_distances[pair] = distance
-                print("PAIR: ", pair,"DISTANCE: ", pair_distances[pair])
 
+                pair.value = distance
 
+                print("PAIR:DISTANCE ", pair)
+            else:
+                # If no solution was found, store the distance as -1
+                pair_distances[pair] = -1
+                pair.value = -1
+
+        # Sort the pairs by their distances
 
         self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
