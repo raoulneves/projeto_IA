@@ -625,7 +625,7 @@ class SearchSolver(threading.Thread):
         a_star_search = AStarSearch()
 
         # Initialize an empty dictionary to store the distances between pairs
-        pair_distances = {}
+        pair_distances = []
 
         # Loop through each pair in the agent's pairs list
         for pair in self.agent.pairs:
@@ -650,13 +650,16 @@ class SearchSolver(threading.Thread):
 
             if solution is not None:
                 # Calculate the distance between the pair's points based on the solution's path
-                distance = len(solution.actions)
+                pair.value = len(solution.actions)
+                print("PAIR: ", pair)
+                print("PAIR VALUE: ", pair.value)
+                print("PAIR CELL 2: ", pair.cell2)
                 # Store the distance in the pair_distances dictionary with the pair as the key
-                pair_distances[pair] = distance
+                pair_distances.append(pair)
 
-                pair.value = distance
+                #1pair.value = distance
 
-                print("PAIR:DISTANCE ", pair)
+                #1print("PAIR:DISTANCE ", pair)
                 for actions in solution.actions:
                     print(actions)
             else:
@@ -666,7 +669,14 @@ class SearchSolver(threading.Thread):
 
         # Sort the pairs by their distances
 
+        for pair in pair_distances:
+            print("Pair: ", pair, " - ", pair_distances[pair])
 
+        if len(self.agent.pairs) == len(pair_distances):
+            for i, distance in enumerate(pair_distances):
+                self.agent.pairs[i].value = distance
+        else:
+            print("The lengths of the two lists do not match.")
 
         self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
