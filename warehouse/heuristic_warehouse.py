@@ -15,7 +15,7 @@ class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
 
         heuristic_value = abs(forklift_pos[0] - exit_pos[0]) + abs(forklift_pos[1] - exit_pos[1])
 
-        return 1
+        return heuristic_value
     def __str__(self):
         return "HeuristicWarehouse"
 
