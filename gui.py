@@ -305,7 +305,6 @@ class Window(tk.Tk):
         self.solver.start()
         self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
 
-
     def runGA_button_clicked(self):
 
         if self.problem_ga is None:
@@ -619,10 +618,9 @@ class SearchSolver(threading.Thread):
         self.agent.stop()
 
     def run(self):
+        # --------TODONE calculate pairs distances
 
-        # TODO calculate pairs distances
         # Create an instance of the AStarSearch class
-
         a_star_search = AStarSearch()
 
         # Loop through each pair in the agent's pairs list
@@ -650,6 +648,7 @@ class SearchSolver(threading.Thread):
                 # Calculate the distance between the pair's points based on the solution's path
                 pair.value = len(solution.actions)
 
+                # Update the agent's pairs list with the distance
                 self.agent.pairs[i].value = pair.value
 
                 # DEBUG
@@ -660,8 +659,6 @@ class SearchSolver(threading.Thread):
                 # If no solution was found, store the distance as -1
                 self.agent.pairs[i].value = -1
                 pair.value = -1
-
-
 
         self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
