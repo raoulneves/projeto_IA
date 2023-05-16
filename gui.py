@@ -305,6 +305,7 @@ class Window(tk.Tk):
         self.solver.start()
         self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
 
+
     def runGA_button_clicked(self):
 
         if self.problem_ga is None:
@@ -624,11 +625,8 @@ class SearchSolver(threading.Thread):
 
         a_star_search = AStarSearch()
 
-        # Initialize an empty dictionary to store the distances between pairs
-        pair_distances = []
-
         # Loop through each pair in the agent's pairs list
-        for pair in self.agent.pairs:
+        for i, pair in enumerate(self.agent.pairs):
             # Get the coordinates of the pair's starting and ending points
             start = pair.cell1
             end = pair.cell2
@@ -651,32 +649,19 @@ class SearchSolver(threading.Thread):
             if solution is not None:
                 # Calculate the distance between the pair's points based on the solution's path
                 pair.value = len(solution.actions)
-                print("PAIR: ", pair)
-                print("PAIR VALUE: ", pair.value)
-                print("PAIR CELL 2: ", pair.cell2)
-                # Store the distance in the pair_distances dictionary with the pair as the key
-                pair_distances.append(pair)
 
-                #1pair.value = distance
+                self.agent.pairs[i].value = pair.value
 
-                #1print("PAIR:DISTANCE ", pair)
-                for actions in solution.actions:
-                    print(actions)
+                # DEBUG
+                # 1print("PAIR:DISTANCE ", pair)
+                # for actions in solution.actions:
+                #    print(actions)
             else:
                 # If no solution was found, store the distance as -1
-                pair_distances[pair] = -1
+                self.agent.pairs[i].value = -1
                 pair.value = -1
 
-        # Sort the pairs by their distances
 
-        for pair in pair_distances:
-            print("Pair: ", pair, " - ", pair_distances[pair])
-
-        if len(self.agent.pairs) == len(pair_distances):
-            for i, distance in enumerate(pair_distances):
-                self.agent.pairs[i].value = distance
-        else:
-            print("The lengths of the two lists do not match.")
 
         self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
