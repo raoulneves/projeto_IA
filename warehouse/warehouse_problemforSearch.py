@@ -29,18 +29,24 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
     def is_goal(self, state: WarehouseState) -> bool:
         # Verifies if the agent is adjacent to the goal position
 
-        if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
-            return True
-        elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column + 1:
-            return True
-        elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column - 1:
-            return True
-        elif state.line_forklift == self.goal_position.line + 1 and state.column_forklift == self.goal_position.column:
-            return True
-        elif state.line_forklift == self.goal_position.line - 1 and state.column_forklift == self.goal_position.column:
-            return True
+        if self.goal_position.line == state.line_exit and self.goal_position.column == state.column_exit:
+            if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
+                return True
+            else:
+                return False
         else:
-            return False
+            if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
+                return True
+            elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column + 1:
+                return True
+            elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column - 1:
+                return True
+            elif state.line_forklift == self.goal_position.line + 1 and state.column_forklift == self.goal_position.column:
+                return True
+            elif state.line_forklift == self.goal_position.line - 1 and state.column_forklift == self.goal_position.column:
+                return True
+            else:
+                return False
 
 
 
