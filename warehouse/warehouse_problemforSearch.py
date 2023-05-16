@@ -1,4 +1,3 @@
-
 import copy
 
 from agentsearch.problem import Problem
@@ -27,13 +26,14 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
         return successor
 
     def is_goal(self, state: WarehouseState) -> bool:
-        # Verifies if the agent is adjacent to the goal position
 
+        # Verifies if the goal position is the exit, if so, verifies if the agent is on top of the exit
         if self.goal_position.line == state.line_exit and self.goal_position.column == state.column_exit:
             if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
                 return True
             else:
                 return False
+        # Verifies if the agent is adjacent to the goal position
         else:
             if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
                 return True
@@ -47,8 +47,6 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
                 return True
             else:
                 return False
-
-
 
     # This method assumes that the tiles in the goal state are ordered from top to bottom, from left to right.
     def compute_path_cost(self, path: list) -> int:
