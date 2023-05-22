@@ -391,17 +391,35 @@ class Window(tk.Tk):
         columns = state.columns
         i = 0
 
+        # Draw the y-axis labels (row numbers)
+        for row in range(rows):
+            y = (row + 1) * 16  # Calculate the y-coordinate of the label
+            self.canvas.create_text(8, y + 8, text=str(row), font=("Arial", 9),
+                                    anchor="e")  # Show row number on the left side
+
+        # Draw the x-axis labels (column numbers)
+        for col in range(columns):
+            x = (col + 1) * 16  # Calculate the x-coordinate of the label
+            y = 1  # Adjust the y-coordinate of the label
+            self.canvas.create_text(x + 8, y, text=str(col), font=("Arial", 9),
+                                    anchor="n")  # Show column number at the top
+
+        # Draw the cells of the warehouse
         for row in range(rows):
             for col in range(columns):
-                x1 = (col + 1) * 16
-                y1 = (row + 1) * 16
-                x2 = x1 + 16
-                y2 = y1 + 16
+                x1 = (col + 1) * 16  # Calculate the x-coordinate of the top-left corner of the rectangle
+                y1 = (row + 1) * 16  # Calculate the y-coordinate of the top-left corner of the rectangle
+                x2 = x1 + 16  # Calculate the x-coordinate of the bottom-right corner of the rectangle
+                y2 = y1 + 16  # Calculate the y-coordinate of the bottom-right corner of the rectangle
+
+                # Create a rectangle on the canvas representing the cell in the warehouse
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=state.get_cell_color(row, col))
 
                 if state.matrix[row][col] == constants.PRODUCT or state.matrix[row][col] == constants.PRODUCT_CATCH:
                     i += 1
+                    # Create text inside the cell representing the product number
                     self.canvas.create_text(x1 + 8, y1 + 8, text=str(i), font=("Arial", 9))
+
 
     def stop_button_clicked(self):
         if self.solver is not None and not self.solver.agent.search_method.stopped:
@@ -681,28 +699,60 @@ class SolutionRunner(threading.Thread):
         self.thread_running = False
 
     def run(self):
+        # Set the thread_running attribute to True
         self.thread_running = True
+
+        # Obtain the best path and the number of steps in the path
         forklift_path, steps = self.best_in_run.obtain_all_path()
+
+        # Initialize old_cell as a list of None with the same length as forklift_path
         old_cell = [None] * len(forklift_path)
+
+        # Initialize new_cells as an empty list
         new_cells = []
+
+        # Loop over each step in the path except the last one
         for step in range(steps - 1):
+
+            # Clear the list of new_cells
             new_cells.clear()
+
+            # If the thread is not running, exit the function
             if not self.thread_running:
                 return
+
+            # Loop over each index in the forklift_path list
             for j in range(len(forklift_path)):
+
+                # If old_cell[j] is None, set it to the first cell in the path for the j-th forklift
                 if old_cell[j] is None:
                     firs_cell = forklift_path[j][0]
                     old_cell[j] = firs_cell
+
+                # If the current step is less than the length of the path for the j-th forklift - 1
                 if step < len(forklift_path[j]) - 1:
+
+                    # If old_cell[j] is not in new_cells, set the matrix cell at its position to constants.EMPTY
                     if old_cell[j] not in new_cells:
                         self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.EMPTY
+
+                    # Set new_cell to the next cell in the path for the j-th forklift and add it to new_cells
                     new_cell = forklift_path[j][step + 1]
                     new_cells.append(new_cell)
+
+                    # Set the matrix cell at the position of new_cell to constants.FORKLIFT and update old_cell[j]
                     self.state.matrix[new_cell.line][new_cell.column] = constants.FORKLIFT
                     old_cell[j] = new_cell
+
+                # If the current step is not less than the length of the path for the j-th forklift - 1
                 else:
+                    # Set the matrix cell at the position of old_cell[j] to constants.FORKLIFT
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO put the catched products in black
+                # TODO: add functionality for putting the caught products in black
+
+            # Put a copy of the state and the step in the gui's queue
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
+
+        # After all steps have been processed, put a None state in the gui's queue to signal that we're done
         self.gui.queue.put((None, steps, True))  # Done
