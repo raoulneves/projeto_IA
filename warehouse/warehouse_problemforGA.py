@@ -10,14 +10,13 @@ class WarehouseProblemGA(Problem):
         self.products = agent_search.products
         self.agent_search = agent_search
 
-        # Not sure yet
-
-
-
-
+        # Not s ure yet
+        self.pairs = agent_search.pairs
 
     def generate_individual(self) -> "WarehouseIndividual":
-        new_individual = WarehouseIndividual(self, len(self.forklifts))
+        # Genome length is the number of products
+        new_individual = WarehouseIndividual(self, len(self.products))
+        new_individual.initialize()
         return new_individual
 
     def __str__(self):
@@ -26,4 +25,3 @@ class WarehouseProblemGA(Problem):
         string = "# of products: "
         string += f'{len(self.products)}'
         return string
-

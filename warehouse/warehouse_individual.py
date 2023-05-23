@@ -5,6 +5,8 @@ class WarehouseIndividual(IntVectorIndividual):
     def __init__(self, problem: "WarehouseProblem", num_genes: int):
         super().__init__(problem, num_genes)
         # TODO
+        self.steps = 0
+        self.picked_products = 0
 
 
     def compute_fitness(self) -> float:
