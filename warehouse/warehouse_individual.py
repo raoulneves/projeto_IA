@@ -9,10 +9,12 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def compute_fitness(self) -> float:
         # TODO
+
         return 0
 
     def obtain_all_path(self):
         # TODO
+        # Final step after running GA
         pass
 
     def __str__(self):

@@ -13,7 +13,6 @@ class WarehouseState(State[Action]):
         super().__init__()
         # TODO
 
-
         self.rows = rows
         self.columns = columns
         self.matrix = np.full([self.rows, self.columns], fill_value=0, dtype=int)
@@ -29,22 +28,30 @@ class WarehouseState(State[Action]):
                     self.column_exit = j
 
     def can_move_up(self) -> bool:
-        if self.line_forklift == 0 or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.SHELF or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.PRODUCT:
+        if self.line_forklift == 0 \
+                or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.SHELF \
+                or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.PRODUCT:
             return False
         return True
 
     def can_move_right(self) -> bool:
-        if self.column_forklift == self.columns - 1 or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.SHELF or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.PRODUCT:
+        if self.column_forklift == self.columns - 1 \
+                or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.SHELF \
+                or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.PRODUCT:
             return False
         return True
 
     def can_move_down(self) -> bool:
-        if self.line_forklift == self.rows - 1 or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.SHELF or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.PRODUCT:
+        if self.line_forklift == self.rows - 1 \
+                or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.SHELF \
+                or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.PRODUCT:
             return False
         return True
 
     def can_move_left(self) -> bool:
-        if self.column_forklift == 0 or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.SHELF or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.PRODUCT:
+        if self.column_forklift == 0 \
+                or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.SHELF \
+                or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.PRODUCT:
             return False
         return True
 

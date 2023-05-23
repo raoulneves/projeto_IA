@@ -1,3 +1,4 @@
+from itertools import combinations, permutations
 from typing import TypeVar  # Used for type hinting
 
 import numpy as np  # Used for numerical computations
@@ -37,10 +38,15 @@ class WarehouseAgentSearch(Agent):
             for p in self.products:
                 self.pairs.append(Pair(a, p))
 
-        # Creating pairs of products
-        for i in range(len(self.products) - 1):
-            for j in range(i + 1, len(self.products)):
-                self.pairs.append(Pair(self.products[i], self.products[j]))
+        # # Creating pairs of products
+        # for i in range(len(self.products) - 1):
+        #     for j in range(i + 1, len(self.products)):
+        #         self.pairs.append(Pair(self.products[i], self.products[j]))
+
+        # Creating pairs of products, PLUS REVERSE ORDER!
+        # Ignore IDE error, it works
+        for product_permutation in permutations(self.products, 2):
+            self.pairs.append(Pair(*product_permutation))
 
         # Creating pairs of products and exit
         for p in self.products:
