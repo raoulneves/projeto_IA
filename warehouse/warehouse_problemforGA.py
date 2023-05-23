@@ -13,6 +13,14 @@ class WarehouseProblemGA(Problem):
         # Not s ure yet
         self.pairs = agent_search.pairs
 
+        # Generate a list of tuples with the index and the forklift
+        tuple_agent_list = [(i, forklift) for i, forklift in enumerate(self.agent_search.forklifts)]
+        self.agents_db = tuple(tuple_agent_list)
+
+        # Generate a list of tuples with the index and the product
+        tuple_product_list = [(i, product) for i, product in enumerate(self.agent_search.products)]
+        self.products_db = tuple(tuple_product_list)
+
     def generate_individual(self) -> "WarehouseIndividual":
         # Genome length is the number of products
         new_individual = WarehouseIndividual(self, len(self.products))

@@ -36,19 +36,11 @@ class IntVectorIndividual(Individual):
 
         self.genome = np.full((num_genes, 2), 0, dtype=int)
 
-        # Generate a list of tuples with the index and the forklift
-        tuple_agent_list = [(i, forklift) for i, forklift in enumerate(self.problem.forklifts)]
-        self.agents = tuple(tuple_agent_list)
-
-        # Generate a list of tuples with the index and the product
-        tuple_product_list = [(i, product) for i, product in enumerate(self.problem.products)]
-        self.products = tuple(tuple_product_list)
-
 
     def initialize(self):
         # Create a deep copy of the list of products
         # INFO: ITS "COPYCOPY" BECAUSE COPY WAS ALREADY USED FOR SOMETHING ELSE!
-        copied_list_products = list(copycopy.deepcopy(self.products))
+        copied_list_products = list(copycopy.deepcopy(self.problem.products_db))
 
         # Shuffle the copied list
         random.shuffle(copied_list_products)
@@ -58,7 +50,7 @@ class IntVectorIndividual(Individual):
         for i, (product_id, _) in enumerate(copied_list_products):
             print("------------------")
             print("Product: ", product_id)
-            agent_id = random.choice(self.agents)[0]
+            agent_id = random.choice(self.problem.agents_db)[0]
             print("Agents: ", agent_id)
             self.genome[i] = [product_id, agent_id]
 

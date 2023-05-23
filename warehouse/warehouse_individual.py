@@ -15,18 +15,51 @@ class WarehouseIndividual(IntVectorIndividual):
         self.steps = 0
         self.picked_products = 0
 
-        for i, agent in enumerate(self.agents):
+        # Iterate over all agents to calculate the steps and picked products
+        for i, agent in enumerate(self.problem.agents_db):
             agent_id = agent[0]
             agent_pos = agent[1]
-            for j, product in enumerate(self.genome):
-                product = self.genome[j, 0]
-                agent_genome = self.genome[j, 1]
+            agent_current_pos = None
+            first_pass_flag = True
 
-                if agent_id == agent_genome:
-                    # self.steps += self.
-                    self.picked_products += 1
+            # Iterate over all tasks in the GENOME to calculate the steps and picked products
+            for j, task in enumerate(self.genome):
+                product_tofetch_id = task[0]
+                agent_fetcher_id = task[1]
+                product_pos = None
+                agent_retrieved_pos = None
 
-        return 0
+                if agent_id == agent_fetcher_id:
+
+                    # Retrieve the position of the product to fetch
+                    for data in self.problem.products_db:
+                        if data[0] == product_tofetch_id:
+                            product_pos = data[1]
+                            break
+
+                    # Retrieve the position of the agent
+                    for data in self.problem.agents_db:
+                        if data[0] == agent_fetcher_id:
+                            agent_retrieved_pos = data[1]
+                            break
+
+                    # Find the cost already calculated
+                    for pairs in self.problem.pairs:
+                        # If it's the first time, use starting position
+                        if first_pass_flag:
+                            if pairs.cell1 == agent_retrieved_pos and pairs.cell2 == product_pos:
+                                self.steps += pairs.value
+                                break
+                        # If it's not the first time, use the last position
+                        else:
+                            if pairs.cell1 == agent_current_pos and pairs.cell2 == product_pos:
+                                self.steps += pairs.value
+                                break
+
+                    agent_current_pos = product_pos
+
+        print("Steps: ", self.steps)
+        return self.steps
 
     def obtain_all_path(self):
         # TODO
