@@ -1,16 +1,30 @@
 from ga.individual_int_vector import IntVectorIndividual
 
+
 class WarehouseIndividual(IntVectorIndividual):
 
     def __init__(self, problem: "WarehouseProblem", num_genes: int):
         super().__init__(problem, num_genes)
         # TODO
-        self.steps = 0
-        self.picked_products = 0
-
+        self.steps = None
+        self.picked_products = None
 
     def compute_fitness(self) -> float:
         # TODO
+
+        self.steps = 0
+        self.picked_products = 0
+
+        for i, agent in enumerate(self.agents):
+            agent_id = agent[0]
+            agent_pos = agent[1]
+            for j, product in enumerate(self.genome):
+                product = self.genome[j, 0]
+                agent_genome = self.genome[j, 1]
+
+                if agent_id == agent_genome:
+                    # self.steps += self.
+                    self.picked_products += 1
 
         return 0
 
@@ -21,7 +35,7 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def __str__(self):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
-        string += str (self.genome) + "\n\n"
+        string += str(self.genome) + "\n\n"
         # TODO
         return string
 

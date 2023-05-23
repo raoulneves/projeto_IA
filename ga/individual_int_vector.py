@@ -1,13 +1,14 @@
 import random
 from abc import abstractmethod
 
-
 import numpy as np
 from numpy.ma import copy
 
 from ga.genetic_algorithm import GeneticAlgorithm
 from ga.problem import Problem
 from ga.individual import Individual
+import copy as copycopy
+
 
 class IntVectorIndividual(Individual):
 
@@ -35,20 +36,33 @@ class IntVectorIndividual(Individual):
 
         self.genome = np.full((num_genes, 2), 0, dtype=int)
 
+        # Generate a list of tuples with the index and the forklift
+        tuple_agent_list = [(i, forklift) for i, forklift in enumerate(self.problem.forklifts)]
+        self.agents = tuple(tuple_agent_list)
+
+        # Generate a list of tuples with the index and the product
+        tuple_product_list = [(i, product) for i, product in enumerate(self.problem.products)]
+        self.products = tuple(tuple_product_list)
 
 
     def initialize(self):
         # Create a deep copy of the list of products
-        copied_list_products = copy.deepcopy(self.problem.products)
+        # INFO: ITS "COPYCOPY" BECAUSE COPY WAS ALREADY USED FOR SOMETHING ELSE!
+        copied_list_products = list(copycopy.deepcopy(self.products))
 
         # Shuffle the copied list
         random.shuffle(copied_list_products)
 
         # Generate the genome by randomly assigning products to agents
         # genome = [(product, random.choice(agents)) for product in products]
-        for i, product in enumerate(copied_list_products):
-            self.genome[i] = [product, random.choice(self.problem.agents)]
+        for i, (product_id, _) in enumerate(copied_list_products):
+            print("------------------")
+            print("Product: ", product_id)
+            agent_id = random.choice(self.agents)[0]
+            print("Agents: ", agent_id)
+            self.genome[i] = [product_id, agent_id]
 
+            print("Genome: ", self.genome[i])
 
     def swap_genes(self, other, index: int):
         aux = self.genome[index]
