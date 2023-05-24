@@ -30,7 +30,8 @@ class WarehouseState(State[Action]):
     def can_move_up(self) -> bool:
         if self.line_forklift == 0 \
                 or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.SHELF \
-                or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.PRODUCT:
+                or self.matrix[self.line_forklift - 1][self.column_forklift] == constants.PRODUCT \
+                or self.matrix[self.line_forklift][self.column_forklift] == constants.PRODUCT:
             return False
         return True
 
@@ -44,7 +45,8 @@ class WarehouseState(State[Action]):
     def can_move_down(self) -> bool:
         if self.line_forklift == self.rows - 1 \
                 or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.SHELF \
-                or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.PRODUCT:
+                or self.matrix[self.line_forklift + 1][self.column_forklift] == constants.PRODUCT \
+                or self.matrix[self.line_forklift][self.column_forklift] == constants.PRODUCT:
             return False
         return True
 

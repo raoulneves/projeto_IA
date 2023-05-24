@@ -21,6 +21,7 @@ class WarehouseIndividual(IntVectorIndividual):
             agent_pos = agent[1]
             agent_current_pos = None
             first_pass_flag = True
+            print("______________AGENT______________")
 
             # Iterate over all tasks in the GENOME to calculate the steps and picked products
             for j, task in enumerate(self.genome):
@@ -46,21 +47,28 @@ class WarehouseIndividual(IntVectorIndividual):
                     for pairs in self.problem.pairs:
                         # If it's the first time, use starting position
                         if first_pass_flag:
+
                             if pairs.cell1 == agent_retrieved_pos and pairs.cell2 == product_pos:
                                 self.steps += pairs.value
+                                print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
+                                first_pass_flag = False
                                 break
                         # If it's not the first time, use the last position
                         else:
+
                             if pairs.cell1 == agent_current_pos and pairs.cell2 == product_pos:
                                 self.steps += pairs.value
+                                print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
                                 break
 
                     agent_current_pos = product_pos
 
             # Find the cost to the exit
             for pairs in self.problem.pairs:
+
                 if pairs.cell1 == agent_current_pos and pairs.cell2 == self.problem.exit:
                     self.steps += pairs.value
+                    print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
                     break
 
         print("Steps: ", self.steps)
@@ -75,6 +83,9 @@ class WarehouseIndividual(IntVectorIndividual):
     def __str__(self):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
         string += str(self.genome) + "\n\n"
+        for product in self.problem.products_db:
+            string += str(product[0]) + "\n"
+            string += str(product[1]) + "\n"
         # TODO
         return string
 

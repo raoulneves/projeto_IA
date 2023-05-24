@@ -27,25 +27,26 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
 
     def is_goal(self, state: WarehouseState) -> bool:
 
-        # Verifies if the goal position is the exit, if so, verifies if the agent is on top of the exit
+        # Check if the goal position is the same as the exit position
         if self.goal_position.line == state.line_exit and self.goal_position.column == state.column_exit:
+            # If the goal position is the same as the exit position, check if the agent (forklift) is currently at the goal position
             if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
                 return True
             else:
                 return False
-        # Verifies if the agent is adjacent to the goal position
+        # If the goal position is not the same as the exit position, check if the agent is adjacent to the goal position
         else:
-            if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
+            # # Check if the agent is currently at the goal position
+            # if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
+            #     return True
+            # Check if the agent is to the right of the goal position
+            if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column + 1:
                 return True
-            elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column + 1:
-                return True
+            # Check if the agent is to the left of the goal position
             elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column - 1:
                 return True
-            elif state.line_forklift == self.goal_position.line + 1 and state.column_forklift == self.goal_position.column:
-                return True
-            elif state.line_forklift == self.goal_position.line - 1 and state.column_forklift == self.goal_position.column:
-                return True
             else:
+                # If the agent is not at the goal position or adjacent to it, return False (the agent is neither at the goal nor adjacent to it)
                 return False
 
     # This method assumes that the tiles in the goal state are ordered from top to bottom, from left to right.
