@@ -30,7 +30,6 @@ class WarehouseIndividual(IntVectorIndividual):
                 agent_retrieved_pos = None
 
                 if agent_id == agent_fetcher_id:
-
                     # Retrieve the position of the product to fetch
                     for data in self.problem.products_db:
                         if data[0] == product_tofetch_id:
@@ -58,7 +57,14 @@ class WarehouseIndividual(IntVectorIndividual):
 
                     agent_current_pos = product_pos
 
+            # Find the cost to the exit
+            for pairs in self.problem.pairs:
+                if pairs.cell1 == agent_current_pos and pairs.cell2 == self.problem.exit:
+                    self.steps += pairs.value
+                    break
+
         print("Steps: ", self.steps)
+        self.fitness = self.steps
         return self.steps
 
     def obtain_all_path(self):

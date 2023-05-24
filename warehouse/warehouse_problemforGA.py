@@ -12,6 +12,7 @@ class WarehouseProblemGA(Problem):
 
         # Not s ure yet
         self.pairs = agent_search.pairs
+        self.exit = agent_search.exit
 
         # Generate a list of tuples with the index and the forklift
         tuple_agent_list = [(i, forklift) for i, forklift in enumerate(self.agent_search.forklifts)]
