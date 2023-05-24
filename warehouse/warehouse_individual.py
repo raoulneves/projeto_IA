@@ -21,7 +21,6 @@ class WarehouseIndividual(IntVectorIndividual):
             agent_pos = agent[1]
             agent_current_pos = None
             first_pass_flag = True
-            print("______________AGENT______________")
 
             # Iterate over all tasks in the GENOME to calculate the steps and picked products
             for j, task in enumerate(self.genome):
@@ -50,7 +49,6 @@ class WarehouseIndividual(IntVectorIndividual):
 
                             if pairs.cell1 == agent_retrieved_pos and pairs.cell2 == product_pos:
                                 self.steps += pairs.value
-                                print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
                                 first_pass_flag = False
                                 break
                         # If it's not the first time, use the last position
@@ -58,7 +56,6 @@ class WarehouseIndividual(IntVectorIndividual):
 
                             if pairs.cell1 == agent_current_pos and pairs.cell2 == product_pos:
                                 self.steps += pairs.value
-                                print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
                                 break
 
                     agent_current_pos = product_pos
@@ -68,10 +65,8 @@ class WarehouseIndividual(IntVectorIndividual):
 
                 if pairs.cell1 == agent_current_pos and pairs.cell2 == self.problem.exit:
                     self.steps += pairs.value
-                    print("FOUND PAIR: ", pairs.cell1, " ", pairs.cell2, " ", pairs.value)
                     break
 
-        print("Steps: ", self.steps)
         self.fitness = self.steps
         return self.steps
 

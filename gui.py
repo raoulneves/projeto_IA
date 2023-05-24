@@ -662,12 +662,24 @@ class SearchSolver(threading.Thread):
             # Run the A* search algorithm to find the shortest path
             solution = a_star_search.search(problem)
 
+            # Check if a solution was found
             if solution is not None:
-                # Calculate the distance between the pair's points based on the solution's path
-                pair.value = len(solution.actions)
 
-                # Update the agent's pairs list with the distance
-                self.agent.pairs[i].value = pair.value
+                for product in self.agent.products:
+                    # If starting from product position, remove first step from solution
+                    if start.line == product.line and start.column == product.column:
+                        # Calculate the distance between the pair's points based on the solution's path
+                        pair.value = len(solution.actions) - 1
+                        # Update the agent's pairs list with the distance
+                        self.agent.pairs[i].value = pair.value
+                        # Remove the first step from the solution
+                        del solution.actions[0]
+                    else:
+                        # Calculate the distance between the pair's points based on the solution's path
+                        pair.value = len(solution.actions)
+                        # Update the agent's pairs list with the distance
+                        self.agent.pairs[i].value = pair.value
+
 
                 # DEBUG
                 # 1print("PAIR:DISTANCE ", pair)

@@ -48,13 +48,9 @@ class IntVectorIndividual(Individual):
         # Generate the genome by randomly assigning products to agents
         # genome = [(product, random.choice(agents)) for product in products]
         for i, (product_id, _) in enumerate(copied_list_products):
-            print("------------------")
-            print("Product: ", product_id)
             agent_id = random.choice(self.problem.agents_db)[0]
-            print("Agents: ", agent_id)
             self.genome[i] = [product_id, agent_id]
 
-            print("Genome: ", self.genome[i])
 
     def swap_genes(self, other, index: int):
         aux = self.genome[index]
