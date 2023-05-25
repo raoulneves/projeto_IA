@@ -10,7 +10,6 @@ class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
 
     def compute(self, state: WarehouseState) -> float:
         # TODO
-
         # The heuristic value is the Manhattan distance between the forklift and the exit
         forklift_pos = (state.line_forklift, state.column_forklift)
         exit_pos = (state.line_exit, state.column_exit)

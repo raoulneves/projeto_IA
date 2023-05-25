@@ -3,6 +3,7 @@ class Pair:
         self.cell1 = cell1
         self.cell2 = cell2
         self.value = 0
+        self.solution = []
         # TODO?
 
     def hash(self):
