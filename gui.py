@@ -668,28 +668,21 @@ class SearchSolver(threading.Thread):
             # Check if a solution was found
             if solution is not None:
                 for product in self.agent.products:
+
                     # If starting from product position, remove first step from solution
                     if start.line == product.line and start.column == product.column:
                         # Calculate the distance between the pair's points based on the solution's path
                         # Remove the first step from the solution
                         del solution.actions[0]
-                        self.agent.pairs[i].solution = solution.actions
-                        # Update the agent's pairs list with the distance
-                        self.agent.pairs[i].value = solution.cost
-                    elif end.line == product.line and end.column == product.column:
+                    if end.line == product.line and end.column == product.column:
                         # Calculate the distance between the pair's points based on the solution's path
-                        # Remove the first step from the solution
-                        del solution.actions[0]
                         # Remove the last step from the solution
                         solution.actions.pop()
-                        self.agent.pairs[i].solution = solution.actions
-                        # Update the agent's pairs list with the distance
-                        self.agent.pairs[i].value = solution.cost
-                    else:
-                        # Calculate the distance between the pair's points based on the solution's path
-                        # Update the agent's pairs list with the distance
-                        self.agent.pairs[i].value = solution.cost
-                        self.agent.pairs[i].solution = solution.actions
+
+                    # Calculate the distance between the pair's points based on the solution's path
+                    # Update the agent's pairs list with the distance
+                    self.agent.pairs[i].value = solution.cost
+                    self.agent.pairs[i].solution = solution.actions
             else:
                 # If no solution was found, store the distance as -1
                 self.agent.pairs[i].value = -1
