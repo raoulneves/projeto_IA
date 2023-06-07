@@ -2,6 +2,7 @@ from ga.genetic_operators.recombination import Recombination
 from ga.individual import Individual
 from ga.genetic_algorithm import GeneticAlgorithm
 
+
 class RecombinationPMX(Recombination):
 
     def __init__(self, probability: float):
@@ -21,27 +22,27 @@ class RecombinationPMX(Recombination):
 
         # Create the first child by copying the selected segment from ind1
         # and filling in the remaining genes from ind2
-        child1 = [[-1,-1] for _ in range(len(ind1.genome))]
+        child1 = [[i, -1] for i in range(len(ind1.genome))]
         for i in range(cut1, cut2 + 1):
-            child1[i] = ind1.genome[i]
+            child1[i][1] = ind1.genome[i][1]
         for i in range(len(ind1.genome)):
-            if child1[i] == -1:
-                gene = ind2.genome[i]
+            if child1[i][1] == -1:
+                gene = ind2.genome[i][1]
                 while i in mapping1:
-                    gene = mapping1[i]
-                child1[i] = gene
+                    gene = mapping1[i][1]
+                child1[i][1] = gene
 
         # Create the second child by copying the selected segment from ind2
         # and filling in the remaining genes from ind1
-        child2 = [[-1,-1] for _ in range(len(ind1.genome))]
+        child2 = [[i , -1] for i in range(len(ind1.genome))]
         for i in range(cut1, cut2 + 1):
-            child2[i] = ind2.genome[i]
+            child2[i][1] = ind2.genome[i][1]
         for i in range(len(ind1.genome)):
-            if child2[i] == -1:
-                gene = ind1.genome[i]
+            if child2[i][1] == -1:
+                gene = ind1.genome[i][1]
                 while i in mapping2:
-                    gene = mapping2[i]
-                child2[i] = gene
+                    gene = mapping2[i][1]
+                child2[i][1] = gene
 
         ind1.genome = child2
         ind2.genome = child1

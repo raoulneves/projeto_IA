@@ -420,7 +420,6 @@ class Window(tk.Tk):
                     # Create text inside the cell representing the product number
                     self.canvas.create_text(x1 + 8, y1 + 8, text=str(i), font=("Arial", 9))
 
-
     def stop_button_clicked(self):
         if self.solver is not None and not self.solver.agent.search_method.stopped:
             self.solver.stop()
@@ -638,13 +637,11 @@ class SearchSolver(threading.Thread):
     def run(self):
         # --------TODONE calculate pairs distances
 
-
-
         # Loop through each pair in the agent's pairs list
         for i, pair in enumerate(self.agent.pairs):
             # Create an instance of the AStarSearch class
             a_star_search = AStarSearch()
-            
+
             # Get the coordinates of the pair's starting and ending points
             start = pair.cell1
             end = pair.cell2
@@ -667,22 +664,26 @@ class SearchSolver(threading.Thread):
 
             # Check if a solution was found
             if solution is not None:
+                print("FOUND ONE! ", i )
                 for product in self.agent.products:
 
                     # If starting from product position, remove first step from solution
                     if start.line == product.line and start.column == product.column:
                         # Calculate the distance between the pair's points based on the solution's path
                         # Remove the first step from the solution
-                        del solution.actions[0]
+                        if len(solution.actions) > 0:
+                            del solution.actions[0]
                     if end.line == product.line and end.column == product.column:
                         # Calculate the distance between the pair's points based on the solution's path
                         # Remove the last step from the solution
-                        solution.actions.pop()
+                        if len(solution.actions) > 0:
+                            solution.actions.pop()
 
                     # Calculate the distance between the pair's points based on the solution's path
-                    # Update the agent's pairs list with the distance
-                    self.agent.pairs[i].value = solution.cost
-                    self.agent.pairs[i].solution = solution.actions
+                # Update the agent's pairs list with the distance
+                self.agent.pairs[i].value = solution.cost
+                print("SOLUTION COST: ", solution.cost)
+                self.agent.pairs[i].solution = solution.actions
             else:
                 # If no solution was found, store the distance as -1
                 self.agent.pairs[i].value = -1
