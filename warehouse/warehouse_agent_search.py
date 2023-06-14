@@ -1,9 +1,8 @@
-from itertools import combinations, permutations
-from typing import TypeVar  # Used for type hinting
+import copy
+from typing import TypeVar
 
-import numpy as np  # Used for numerical computations
+import numpy as np
 
-# Importing different modules and classes
 import constants
 from agentsearch.agent import Agent
 from agentsearch.state import State
@@ -13,17 +12,16 @@ from warehouse.pair import Pair
 
 
 class WarehouseAgentSearch(Agent):
-    S = TypeVar('S', bound=State)  # A type variable bound to the State class
+    S = TypeVar('S', bound=State)
 
-    def __init__(self, environment: S):  # Initializing the WarehouseAgentSearch class
-        super().__init__()  # Calling the init method of the parent class
-        self.initial_environment = environment  # Storing the initial environment
-        self.heuristic = HeuristicWarehouse()  # Setting up the heuristic
-        self.forklifts = []  # List for storing forklift locations
-        self.products = []  # List for storing product locations
-        self.exit = None  # Variable for storing the exit location
-        self.pairs = []  # List for storing pairs of locations
-        # Looping over the environment matrix to find forklifts, exits and products
+    def __init__(self, environment: S):
+        super().__init__()
+        self.initial_environment = environment
+        self.heuristic = HeuristicWarehouse()
+        self.forklifts = []
+        self.products = []
+        self.exit = None
+        self.pairs = []
         for i in range(environment.rows):
             for j in range(environment.columns):
                 if environment.matrix[i][j] == constants.FORKLIFT:
@@ -33,37 +31,44 @@ class WarehouseAgentSearch(Agent):
                 elif environment.matrix[i][j] == constants.PRODUCT:
                     self.products.append(Cell(i, j))
 
-        # Creating pairs of forklifts and products
+        # Change the position of the products so that path finding is easier
+        fixed_products_pickup = copy.deepcopy(self.products)
+        for i in range(len(fixed_products_pickup)):
+            # Empty on the left
+            if constants.EMPTY == \
+                    environment.matrix[fixed_products_pickup[i].line][fixed_products_pickup[i].column - 1]:
+                fixed_products_pickup[i].column -= 1
+            # Empty on the right
+            elif constants.EMPTY == \
+                    environment.matrix[fixed_products_pickup[i].line][fixed_products_pickup[i].column + 1]:
+                fixed_products_pickup[i].column += 1
+
+        # Forklifts - Products
         for a in self.forklifts:
-            for p in self.products:
+            for p in fixed_products_pickup:
                 self.pairs.append(Pair(a, p))
 
-        # # Creating pairs of products
-        # for i in range(len(self.products) - 1):
-        #     for j in range(i + 1, len(self.products)):
-        #         self.pairs.append(Pair(self.products[i], self.products[j]))
+        # Products - Products
+        for i in range(len(fixed_products_pickup) - 1):
+            for j in range(i + 1, len(fixed_products_pickup)):
+                self.pairs.append(Pair(fixed_products_pickup[i], fixed_products_pickup[j]))
 
-        # Creating pairs of products, PLUS REVERSE ORDER!
-        # Ignore IDE error, it works
-        for product_permutation in permutations(self.products, 2):
-            self.pairs.append(Pair(*product_permutation))
-
-        # Creating pairs of products and exit
-        for p in self.products:
+        # Products - Exit
+        for p in fixed_products_pickup:
             self.pairs.append(Pair(p, self.exit))
 
-        # Creating pairs of forklifts and exit
+        # Forklifts - Exit
         for a in self.forklifts:
             self.pairs.append(Pair(a, self.exit))
 
-    def __str__(self) -> str:  # String representation of WarehouseAgentSearch
+    def __str__(self) -> str:
         str = "Pairs:\n"
         for p in self.pairs:
             str += f"{p}\n"
         return str
 
 
-def read_state_from_txt_file(filename: str):  # Function to read state from a text file
+def read_state_from_txt_file(filename: str):
     with open(filename, 'r') as file:
         num_rows, num_columns = map(int, file.readline().split())
         float_puzzle = np.genfromtxt(file, delimiter=' ')

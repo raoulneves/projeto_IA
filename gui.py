@@ -288,7 +288,7 @@ class Window(tk.Tk):
 
     def runSearch_button_clicked(self):
 
-        self.agent_search.search_method.stopped = False
+        self.agent_search.search_method.stopped=False
 
         self.text_problem.delete("1.0", "end")
 
@@ -303,7 +303,10 @@ class Window(tk.Tk):
         self.solver = SearchSolver(self, self.agent_search)
         self.solver.daemon = True
         self.solver.start()
+
+        self.text_problem.delete("1.0", "end")
         self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
+        self.entry_status.delete(0, tk.END)
 
     def runGA_button_clicked(self):
 
@@ -373,7 +376,7 @@ class Window(tk.Tk):
             if done:
                 self.queue.queue.clear()
                 self.after_cancel(self.after_id)
-                self.after_id = None
+                self.after_id= None
                 self.solution_runner = None
                 self.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                     open_experiments=tk.NORMAL, run_experiments=tk.DISABLED,
@@ -404,20 +407,16 @@ class Window(tk.Tk):
             self.canvas.create_text(x + 8, y, text=str(col), font=("Arial", 9),
                                     anchor="n")  # Show column number at the top
 
-        # Draw the cells of the warehouse
         for row in range(rows):
             for col in range(columns):
-                x1 = (col + 1) * 16  # Calculate the x-coordinate of the top-left corner of the rectangle
-                y1 = (row + 1) * 16  # Calculate the y-coordinate of the top-left corner of the rectangle
-                x2 = x1 + 16  # Calculate the x-coordinate of the bottom-right corner of the rectangle
-                y2 = y1 + 16  # Calculate the y-coordinate of the bottom-right corner of the rectangle
-
-                # Create a rectangle on the canvas representing the cell in the warehouse
+                x1 = (col + 1) * 16
+                y1 = (row + 1) * 16
+                x2 = x1 + 16
+                y2 = y1 + 16
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=state.get_cell_color(row, col))
 
                 if state.matrix[row][col] == constants.PRODUCT or state.matrix[row][col] == constants.PRODUCT_CATCH:
                     i += 1
-                    # Create text inside the cell representing the product number
                     self.canvas.create_text(x1 + 8, y1 + 8, text=str(i), font=("Arial", 9))
 
     def stop_button_clicked(self):
@@ -428,6 +427,7 @@ class Window(tk.Tk):
                                 simulation=tk.DISABLED, stop_simulation=tk.DISABLED)
             self.solver = None
             return
+
 
         if self.solution_runner is not None and self.solution_runner.thread_running:
             self.solution_runner.stop()
@@ -449,6 +449,9 @@ class Window(tk.Tk):
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
                                 simulation=tk.DISABLED, stop_simulation=tk.DISABLED)
             self.genetic_algorithm = None
+
+
+
 
     def open_experiments_button_clicked(self):
         filename = fd.askopenfilename(initialdir='.')
@@ -635,61 +638,36 @@ class SearchSolver(threading.Thread):
         self.agent.stop()
 
     def run(self):
-        # --------TODONE calculate pairs distances
+        # TODO calculate pairs distances
 
-        # Loop through each pair in the agent's pairs list
+        # ---------------------------------------------------------------
+
         for i, pair in enumerate(self.agent.pairs):
-            # Create an instance of the AStarSearch class
             a_star_search = AStarSearch()
 
-            # Get the coordinates of the pair's starting and ending points
             start = pair.cell1
             end = pair.cell2
-            solution_lenght = -1
 
-            # Create the initial state based on the agent's environment
             initial_state = WarehouseState(self.agent.initial_environment.matrix,
                                            self.agent.initial_environment.rows,
                                            self.agent.initial_environment.columns)
 
-            # Set the forklift's position to the starting point of the pair
             initial_state.line_forklift, initial_state.column_forklift = start.line, start.column
 
-            # Create a WarehouseProblemSearch instance with the goal position set to the end point of the pair
             problem = WarehouseProblemSearch(initial_state, end)
             problem.heuristic = HeuristicWarehouse()
 
-            # Run the A* search algorithm to find the shortest path
             solution = a_star_search.search(problem)
 
-            # Check if a solution was found
             if solution is not None:
-                print("FOUND ONE! ", i )
-                for product in self.agent.products:
-
-                    # If starting from product position, remove first step from solution
-                    if start.line == product.line and start.column == product.column:
-                        # Calculate the distance between the pair's points based on the solution's path
-                        # Remove the first step from the solution
-                        if len(solution.actions) > 0:
-                            del solution.actions[0]
-                    if end.line == product.line and end.column == product.column:
-                        # Calculate the distance between the pair's points based on the solution's path
-                        # Remove the last step from the solution
-                        if len(solution.actions) > 0:
-                            solution.actions.pop()
-
-                    # Calculate the distance between the pair's points based on the solution's path
-                # Update the agent's pairs list with the distance
                 self.agent.pairs[i].value = solution.cost
-                print("SOLUTION COST: ", solution.cost)
                 self.agent.pairs[i].solution = solution.actions
             else:
-                # If no solution was found, store the distance as -1
                 self.agent.pairs[i].value = -1
                 pair.value = -1
 
-        self.agent.search_method.stopped = True
+        # ---------------------------------------------------------------
+        self.agent.search_method.stopped=True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
         self.gui.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
@@ -710,60 +688,29 @@ class SolutionRunner(threading.Thread):
         self.thread_running = False
 
     def run(self):
-        # Set the thread_running attribute to True
         self.thread_running = True
-
-        # Obtain the best path and the number of steps in the path
         forklift_path, steps = self.best_in_run.obtain_all_path()
-
-        # Initialize old_cell as a list of None with the same length as forklift_path
         old_cell = [None] * len(forklift_path)
-
-        # Initialize new_cells as an empty list
         new_cells = []
-
-        # Loop over each step in the path except the last one
         for step in range(steps - 1):
-
-            # Clear the list of new_cells
             new_cells.clear()
-
-            # If the thread is not running, exit the function
             if not self.thread_running:
                 return
-
-            # Loop over each index in the forklift_path list
             for j in range(len(forklift_path)):
-
-                # If old_cell[j] is None, set it to the first cell in the path for the j-th forklift
                 if old_cell[j] is None:
                     firs_cell = forklift_path[j][0]
                     old_cell[j] = firs_cell
-
-                # If the current step is less than the length of the path for the j-th forklift - 1
                 if step < len(forklift_path[j]) - 1:
-
-                    # If old_cell[j] is not in new_cells, set the matrix cell at its position to constants.EMPTY
                     if old_cell[j] not in new_cells:
                         self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.EMPTY
-
-                    # Set new_cell to the next cell in the path for the j-th forklift and add it to new_cells
                     new_cell = forklift_path[j][step + 1]
                     new_cells.append(new_cell)
-
-                    # Set the matrix cell at the position of new_cell to constants.FORKLIFT and update old_cell[j]
                     self.state.matrix[new_cell.line][new_cell.column] = constants.FORKLIFT
                     old_cell[j] = new_cell
-
-                # If the current step is not less than the length of the path for the j-th forklift - 1
                 else:
-                    # Set the matrix cell at the position of old_cell[j] to constants.FORKLIFT
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO: add functionality for putting the caught products in black
-
-            # Put a copy of the state and the step in the gui's queue
+                # TODO put the catched products in black
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
-
-        # After all steps have been processed, put a None state in the gui's queue to signal that we're done
         self.gui.queue.put((None, steps, True))  # Done
+
