@@ -6,81 +6,41 @@ class WarehouseIndividual(IntVectorIndividual):
     def __init__(self, problem: "WarehouseProblem", num_genes: int):
         super().__init__(problem, num_genes)
         # TODO
-        self.steps = None
-        self.picked_products = None
+        self.steps = 0
 
     def compute_fitness(self) -> float:
         # TODO
 
         self.steps = 0
-        self.picked_products = 0
 
-        # Iterate over all agents to calculate the steps and picked products
-        for i, agent in enumerate(self.problem.agents_db):
-            agent_id = agent[0]
-            agent_pos = agent[1]
-            agent_current_pos = None
-            first_pass_flag = True
+        for i, gene in enumerate(self.genome):
+            if i == 0:
+                product_tofetch = self.problem.product[gene]
+                agent_fetching = self.problem.agent[gene + 1]
+            else:
+                product_tofetch = self.problem.product[gene + 1]
+                agent_fetching = self.problem.agent[gene + 2]
 
-            # Iterate over all tasks in the GENOME to calculate the steps and picked products
-            for j, task in enumerate(self.genome):
-                product_tofetch_id = task[0]
-                agent_fetcher_id = task[1]
-                product_pos = None
-                agent_retrieved_pos = None
+            agent_location = self.problem.agent[agent_fetching]
+            product_location = self.problem.product[product_tofetch]
 
-                if agent_id == agent_fetcher_id:
-                    # Retrieve the position of the product to fetch
-                    for data in self.problem.products_db:
-                        if data[0] == product_tofetch_id:
-                            product_pos = data[1]
-                            break
-
-                    # Retrieve the position of the agent
-                    for data in self.problem.agents_db:
-                        if data[0] == agent_fetcher_id:
-                            agent_retrieved_pos = data[1]
-                            break
-
-                    # Find the cost already calculated
-                    for pairs in self.problem.pairs:
-                        # If it's the first time, use starting position
-                        if first_pass_flag:
-
-                            if pairs.cell1 == agent_retrieved_pos and pairs.cell2 == product_pos:
-                                self.steps += pairs.value
-                                first_pass_flag = False
-                                break
-                        # If it's not the first time, use the last position
-                        else:
-
-                            if pairs.cell1 == agent_current_pos and pairs.cell2 == product_pos:
-                                self.steps += pairs.value
-                                break
-
-                    agent_current_pos = product_pos
-
-            # Find the cost to the exit
             for pairs in self.problem.pairs:
-
-                if pairs.cell1 == agent_current_pos and pairs.cell2 == self.problem.exit:
+                if pairs.cell1 == agent_location and pairs.cell2 == product_location:
                     self.steps += pairs.value
-                    break
+                elif pairs.cell1 == product_location and pairs.cell2 == agent_location:
+                    self.steps += pairs.value
+                else:
+                    print("ERROR NO PAIR! AGENT: ", agent_location, " PRODUCT: ", product_location)
 
-        self.fitness = self.steps
         return self.steps
 
     def obtain_all_path(self):
         # TODO
-        # Final step after running GA
         pass
 
     def __str__(self):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
         string += str(self.genome) + "\n\n"
-        for product in self.problem.products_db:
-            string += str(product[0]) + "\n"
-            string += str(product[1]) + "\n"
         # TODO
         return string
 

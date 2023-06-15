@@ -19,4 +19,5 @@ class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
         return heuristic_value
 
     def __str__(self):
-        return "HeuristicWarehouse"
+        return "# TODO"
+

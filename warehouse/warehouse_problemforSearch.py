@@ -26,6 +26,7 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
         return successor
 
     def is_goal(self, state: WarehouseState) -> bool:
+        # TODO
 
         if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
             return True
@@ -33,26 +34,21 @@ class WarehouseProblemSearch(Problem[WarehouseState]):
 
         # # Check if the goal position is the same as the exit position
         # if self.goal_position.line == state.line_exit and self.goal_position.column == state.column_exit:
-        #     # If the goal position is the same as the exit position, check if the agent (forklift) is currently at the goal position
+        #     # If the goal position is the same as the exit position, check if the agent (forklift) is currently at
+        #     # the goal position
         #     if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
         #         return True
-        #     else:
-        #         return False
-        # # If the goal position is not the same as the exit position, check if the agent is adjacent to the goal position
-        # else:
-        #     # # Check if the agent is currently at the goal position
-        #     # if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column:
-        #     #     return True
-        #     # Check if the agent is to the right of the goal position
-        #     if state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column + 1:
-        #         return True
-        #     # Check if the agent is to the left of the goal position
-        #     elif state.line_forklift == self.goal_position.line and state.column_forklift == self.goal_position.column - 1:
-        #         return True
-        #     else:
-        #         # If the agent is not at the goal position or adjacent to it, return False (the agent is neither at the goal nor adjacent to it)
-        #         return False
-
-    # This method assumes that the tiles in the goal state are ordered from top to bottom, from left to right.
-    def compute_path_cost(self, path: list) -> int:
-        return len(path)
+        #
+        # # If the goal position is not the same as the exit position, check if the agent is adjacent to the goal
+        # # position
+        # Check if the agent is to the right of the goal position if state.line_forklift ==
+        # self.goal_position.line \ and state.column_forklift == self.goal_position.column + 1: return True
+        #
+        # # Check if the agent is to the left of the goal position
+        # if state.line_forklift == self.goal_position.line \
+        #         and state.column_forklift == self.goal_position.column - 1:
+        #     return True
+        #
+        # # If the agent is not at the goal position or adjacent to it, return False (the agent is neither at the
+        # # goal nor adjacent to it)
+        # return False
