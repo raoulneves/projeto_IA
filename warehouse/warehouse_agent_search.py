@@ -32,7 +32,7 @@ class WarehouseAgentSearch(Agent):
                     self.products.append(Cell(i, j))
 
         # Change the position of the products so that path finding is easier
-        fixed_products_pickup = copy.deepcopy(self.products)
+        fixed_products_pickup = self.products
         for i in range(len(fixed_products_pickup)):
             # Empty on the left
             if constants.EMPTY == \

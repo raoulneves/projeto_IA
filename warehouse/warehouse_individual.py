@@ -12,25 +12,43 @@ class WarehouseIndividual(IntVectorIndividual):
         # TODO
 
         self.steps = 0
+        agent = 0
+        agent_current_position = self.problem.agent_search.forklifts[agent]
 
         for i, gene in enumerate(self.genome):
-            if i == 0:
-                product_tofetch = self.problem.product[gene]
-                agent_fetching = self.problem.agent[gene + 1]
-            else:
-                product_tofetch = self.problem.product[gene + 1]
-                agent_fetching = self.problem.agent[gene + 2]
 
-            agent_location = self.problem.agent[agent_fetching]
-            product_location = self.problem.product[product_tofetch]
-
-            for pairs in self.problem.pairs:
-                if pairs.cell1 == agent_location and pairs.cell2 == product_location:
-                    self.steps += pairs.value
-                elif pairs.cell1 == product_location and pairs.cell2 == agent_location:
-                    self.steps += pairs.value
+            # Check if its 999
+            if gene == 999:
+                # AND if it is not the last gene
+                if i+1 < len(self.genome):
+                    if self.genome[i + 1] != 999 and self.genome[i + 1] is not None:
+                        agent += 1
+                        agent_current_position = self.problem.agent_search.forklifts[agent]
+                        continue
+                    else:
+                        continue
                 else:
-                    print("ERROR NO PAIR! AGENT: ", agent_location, " PRODUCT: ", product_location)
+                    continue
+
+            for pairs in self.problem.agent_search.pairs:
+                if pairs.cell1 == agent_current_position and pairs.cell2 == self.problem.agent_search.products[gene]:
+                    self.steps += pairs.value
+                    agent_current_position = self.problem.agent_search.products[gene]
+                elif pairs.cell1 == self.problem.agent_search.products[gene] and pairs.cell2 == agent_current_position:
+                    self.steps += pairs.value
+                    agent_current_position = self.problem.agent_search.products[gene]
+                #else:
+                    #print("ERROR NO PAIR! AGENT: ", agent_current_position, " PRODUCT: ", self.problem.agent_search.products[gene])
+
+        for pairs in self.problem.agent_search.pairs:
+            if pairs.cell1 == agent_current_position and pairs.cell2 == self.problem.agent_search.exit:
+                self.steps += pairs.value
+            elif pairs.cell2 == self.problem.agent_search.exit and pairs.cell2 == agent_current_position:
+                self.steps += pairs.value
+            #else:
+                #print("ERROR NO PAIR 2! AGENT: ", agent_current_position, " EXIT: ", self.problem.agent_search.exit)
+
+        self.fitness = self.steps
 
         return self.steps
 

@@ -7,6 +7,7 @@ from ga.genetic_algorithm import GeneticAlgorithm
 from ga.problem import Problem
 from ga.individual import Individual
 
+
 class IntVectorIndividual(Individual):
 
     def __init__(self, problem: Problem, num_genes: int):
@@ -15,17 +16,29 @@ class IntVectorIndividual(Individual):
         self.genome = np.full(num_genes, 0, dtype=int)
 
     def initialize(self):
-        # Create pool of product numbers
-        # Generate the genome by randomly assigning products to agents
-        # genome = [(product, random.choice(agents)) for product in products]
-        for i, product in enumerate(self.problem.products * len(self.problem.forklifts)):
-            agent_id = random.choice(self.problem.forklifts)
-            if i == 0:
-                self.genome[i] = product
-                self.genome[i + 1] = agent_id
+
+        # While there are products to be assigned in the list, assign them
+        products_to_assign = list(range(len(self.problem.products)))
+        agents_to_assign = list(range(len(self.problem.forklifts)))
+        index = 0
+        while len(products_to_assign) > 0:
+            # Choose where to separete the genome
+            product_placed = random.choice(products_to_assign)
+            self.genome[index] = product_placed
+
+            products_to_assign.remove(product_placed)
+            index += 1
+
+        while len(agents_to_assign) > 1:
+            if GeneticAlgorithm.rand.random() < 0.8:
+                random_index = random.randrange(len(self.problem.products))
+                self.genome = np.insert(self.genome, random_index, 999)
+                agents_to_assign.pop()
             else:
-                self.genome[i + 1] = product
-                self.genome[i + 2] = agent_id
+                agents_to_assign.pop()
+                self.genome = np.append(self.genome, 999)
+                continue
+
 
     def swap_genes(self, other, index: int):
         aux = self.genome[index]

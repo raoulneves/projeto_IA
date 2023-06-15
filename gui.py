@@ -390,6 +390,7 @@ class Window(tk.Tk):
         rows = state.rows
         columns = state.columns
         i = 0
+        r = 0
 
         # Draw the y-axis labels (row numbers)
         for row in range(rows):
@@ -415,6 +416,10 @@ class Window(tk.Tk):
                 if state.matrix[row][col] == constants.PRODUCT or state.matrix[row][col] == constants.PRODUCT_CATCH:
                     i += 1
                     self.canvas.create_text(x1 + 8, y1 + 8, text=str(i), font=("Arial", 9))
+
+                if state.matrix[row][col] == constants.FORKLIFT:
+                    r += 1
+                    self.canvas.create_text(x1 + 8, y1 + 8, text=str(r), font=("Arial", 9))
 
     def stop_button_clicked(self):
         if self.solver is not None and not self.solver.agent.search_method.stopped:
@@ -659,6 +664,9 @@ class SearchSolver(threading.Thread):
             else:
                 self.agent.pairs[i].value = -1
                 pair.value = -1
+
+            self.gui.text_problem.insert(tk.END, "Running...\nPairs checked: " + str(i) + " / " + str(len(self.agent.pairs)))
+
 
         self.gui.text_problem.delete("1.0", "end")
         self.gui.text_problem.insert(tk.END, str(self.gui.initial_state) + "\n" + str(self.gui.agent_search))
