@@ -273,6 +273,10 @@ class Window(tk.Tk):
             matrix, num_rows, num_columns = read_state_from_txt_file(filename)
             self.initial_state = WarehouseState(matrix, num_rows, num_columns)
             self.agent_search = WarehouseAgentSearch(WarehouseState(matrix, num_rows, num_columns))
+
+            # TODO
+            # self.agent_search.add_heuristic(HeuristicWarehouse())
+
             self.solution = None
             self.text_problem.delete("1.0", "end")
             self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
@@ -653,7 +657,8 @@ class SearchSolver(threading.Thread):
             initial_state.line_forklift, initial_state.column_forklift = start.line, start.column
 
             problem = WarehouseProblemSearch(initial_state, end)
-            problem.heuristic = HeuristicWarehouse()
+            problem.heuristic = HeuristicWarehouse(problem)
+
 
             solution = a_star_search.search(problem)
 
@@ -665,7 +670,9 @@ class SearchSolver(threading.Thread):
                 self.agent.pairs[i].value = -1
                 pair.value = -1
 
+            self.gui.text_problem.delete("1.0", "end")
             self.gui.text_problem.insert(tk.END, "Running...\nPairs checked: " + str(i) + " / " + str(len(self.agent.pairs)))
+            self.gui.entry_status.delete(0, tk.END)
 
 
         self.gui.text_problem.delete("1.0", "end")
