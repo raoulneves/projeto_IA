@@ -39,7 +39,9 @@ class GraphSearch(SearchMethod, Generic[T]):
         self._explored.clear()
         self._frontier.append(Node(problem.initial_state))
 
+        max_steps = 0
         while len(self._frontier) != 0 and not self.stopped:
+            max_steps += 1
             node = self._frontier.pop()
             state = node.state
             if problem.is_goal(state):

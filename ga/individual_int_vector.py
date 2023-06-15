@@ -14,12 +14,12 @@ class IntVectorIndividual(Individual):
         # TODO
         self.genome = np.full(num_genes, 0, dtype=int)
 
-    def initialize(self, prob1s: float):
+    def initialize(self):
         # Create pool of product numbers
         # Generate the genome by randomly assigning products to agents
         # genome = [(product, random.choice(agents)) for product in products]
-        for i, product in enumerate(self.problem.products * self.problem.agents):
-            agent_id = random.choice(self.problem.agents)
+        for i, product in enumerate(self.problem.products * len(self.problem.forklifts)):
+            agent_id = random.choice(self.problem.forklifts)
             if i == 0:
                 self.genome[i] = product
                 self.genome[i + 1] = agent_id

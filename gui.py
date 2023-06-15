@@ -1,4 +1,5 @@
 import copy
+import time
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -288,7 +289,7 @@ class Window(tk.Tk):
 
     def runSearch_button_clicked(self):
 
-        self.agent_search.search_method.stopped=False
+        self.agent_search.search_method.stopped = False
 
         self.text_problem.delete("1.0", "end")
 
@@ -303,10 +304,6 @@ class Window(tk.Tk):
         self.solver = SearchSolver(self, self.agent_search)
         self.solver.daemon = True
         self.solver.start()
-
-        self.text_problem.delete("1.0", "end")
-        self.text_problem.insert(tk.END, str(self.initial_state) + "\n" + str(self.agent_search))
-        self.entry_status.delete(0, tk.END)
 
     def runGA_button_clicked(self):
 
@@ -324,7 +321,7 @@ class Window(tk.Tk):
             Recombination2(float(self.entry_recombination_prob.get())) if recombination_methods_index == 1 else \
                 Recombination3(float(self.entry_recombination_prob.get()))
 
-        mutation_methods_index = self.combo_recombination_methods.current()
+        mutation_methods_index = self.combo_mutation_methods.current()
         mutation_method = MutationInsert(
             float(self.entry_mutation_prob.get())) if mutation_methods_index == 0 else \
             Mutation2(float(self.entry_mutation_prob.get())) if mutation_methods_index == 1 else \
@@ -376,7 +373,7 @@ class Window(tk.Tk):
             if done:
                 self.queue.queue.clear()
                 self.after_cancel(self.after_id)
-                self.after_id= None
+                self.after_id = None
                 self.solution_runner = None
                 self.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                     open_experiments=tk.NORMAL, run_experiments=tk.DISABLED,
@@ -428,7 +425,6 @@ class Window(tk.Tk):
             self.solver = None
             return
 
-
         if self.solution_runner is not None and self.solution_runner.thread_running:
             self.solution_runner.stop()
             self.queue.queue.clear()
@@ -449,9 +445,6 @@ class Window(tk.Tk):
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
                                 simulation=tk.DISABLED, stop_simulation=tk.DISABLED)
             self.genetic_algorithm = None
-
-
-
 
     def open_experiments_button_clicked(self):
         filename = fd.askopenfilename(initialdir='.')
@@ -661,13 +654,17 @@ class SearchSolver(threading.Thread):
 
             if solution is not None:
                 self.agent.pairs[i].value = solution.cost
+                print("I: ", i, "Solution cost: " + str(solution.cost))
                 self.agent.pairs[i].solution = solution.actions
             else:
                 self.agent.pairs[i].value = -1
                 pair.value = -1
 
+        self.gui.text_problem.delete("1.0", "end")
+        self.gui.text_problem.insert(tk.END, str(self.gui.initial_state) + "\n" + str(self.gui.agent_search))
+        self.gui.entry_status.delete(0, tk.END)
         # ---------------------------------------------------------------
-        self.agent.search_method.stopped=True
+        self.agent.search_method.stopped = True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
         self.gui.manage_buttons(data_set=tk.NORMAL, runSearch=tk.DISABLED, runGA=tk.NORMAL, stop=tk.DISABLED,
                                 open_experiments=tk.NORMAL, run_experiments=tk.DISABLED, stop_experiments=tk.DISABLED,
@@ -713,4 +710,3 @@ class SolutionRunner(threading.Thread):
                 # TODO put the catched products in black
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
         self.gui.queue.put((None, steps, True))  # Done
-
