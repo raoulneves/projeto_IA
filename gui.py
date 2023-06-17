@@ -10,6 +10,7 @@ import queue
 import threading
 
 import constants
+from agentsearch.agent import Agent
 from ga.genetic_operators.mutation2 import Mutation2
 from ga.genetic_operators.mutation3 import Mutation3
 from ga.genetic_operators.recombination3 import Recombination3
@@ -646,7 +647,9 @@ class SearchSolver(threading.Thread):
         # ---------------------------------------------------------------
 
         for i, pair in enumerate(self.agent.pairs):
-            a_star_search = AStarSearch()
+
+            test_agent = Agent()
+            test_agent.add_heuristic(HeuristicWarehouse())
 
             start = pair.cell1
             end = pair.cell2
@@ -658,14 +661,13 @@ class SearchSolver(threading.Thread):
             initial_state.line_forklift, initial_state.column_forklift = start.line, start.column
 
             problem = WarehouseProblemSearch(initial_state, end)
-            problem.heuristic = HeuristicWarehouse(problem)
 
-            solution = a_star_search.search(problem)
+            solution = test_agent.solve_problem(problem)
+            test_agent.execute_solution()
 
             if solution is not None:
                 self.agent.pairs[i].value = solution.cost
-                print("I: ", i, "Solution cost: " + str(solution.cost))
-                self.agent.pairs[i].solution = solution.actions
+                self.agent.pairs[i].solution = solution
             else:
                 self.agent.pairs[i].value = -1
                 pair.value = -1
@@ -699,29 +701,49 @@ class SolutionRunner(threading.Thread):
     def stop(self):
         self.thread_running = False
 
+    # noinspection PyUnresolvedReferences
     def run(self):
+        # Set the thread_running flag to True
         self.thread_running = True
+        # Obtain the forklift path and number of steps from the best_in_run object
         forklift_path, steps = self.best_in_run.obtain_all_path()
+        # Initialize variables to keep track of old and new cells
         old_cell = [None] * len(forklift_path)
         new_cells = []
+        # Iterate over each step in the range of steps
         for step in range(steps - 1):
+            # Clear the list of new_cells for each step
             new_cells.clear()
+            # Check if the thread_running flag is False and return if it is
             if not self.thread_running:
                 return
+            # Iterate over each forklift path
             for j in range(len(forklift_path)):
+                # Check if old_cell is None and assign the first cell of the forklift path to old_cell
                 if old_cell[j] is None:
-                    firs_cell = forklift_path[j][0]
-                    old_cell[j] = firs_cell
+                    first_cell = forklift_path[j][0]
+                    old_cell[j] = first_cell
+                # Check if step is less than the length of the forklift path at index j
                 if step < len(forklift_path[j]) - 1:
+                    # Check if old_cell is not in new_cells
                     if old_cell[j] not in new_cells:
+                        # Set the matrix value of old_cell to empty
                         self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.EMPTY
+                    # Get the new_cell at step + 1 from the forklift path at index j
                     new_cell = forklift_path[j][step + 1]
+                    # Add the new_cell to new_cells
                     new_cells.append(new_cell)
+                    # Set the matrix value of new_cell to forklift
                     self.state.matrix[new_cell.line][new_cell.column] = constants.FORKLIFT
+                    # Update old_cell to new_cell
                     old_cell[j] = new_cell
                 else:
+                    # Set the matrix value of old_cell to forklift
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO put the caught products in black
+                # TODO: Put the caught products in black
+
+            # Put a copy of the state, step, and False flag in the GUI queue
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
-        self.gui.queue.put((None, steps, True))  # Done
+        # Put None, steps, and True flag in the GUI queue to indicate completion
+        self.gui.queue.put((None, steps, True))

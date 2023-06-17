@@ -5,9 +5,8 @@ from warehouse.warehouse_state import WarehouseState
 
 class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
 
-    def __init__(self, problem: WarehouseProblemSearch):
+    def __init__(self):
         super().__init__()
-        self.problem = problem
 
     def compute(self, state: WarehouseState) -> float:
         # TODO

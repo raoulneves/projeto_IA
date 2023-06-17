@@ -36,4 +36,4 @@ class Agent:
         return self.search_method.stopped
 
     def add_heuristic(self, heuristic: Heuristic) -> None:
-        self.heuristic.append(heuristic)
+        self.heuristic = heuristic

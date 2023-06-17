@@ -13,10 +13,6 @@ class WarehouseAgentSearch(Agent):
     def __init__(self, environment: S):
         super().__init__()
         self.initial_environment = environment
-
-        # TODO will it work?
-        self.heuristic = None
-
         self.forklifts = []
         self.products = []
         self.exit = None
