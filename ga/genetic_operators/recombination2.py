@@ -1,6 +1,7 @@
 from ga.individual import Individual
 from ga.genetic_operators.recombination import Recombination
 
+
 class Recombination2(Recombination):
 
     def __init__(self, probability: float):

@@ -22,7 +22,7 @@ class IntVectorIndividual(Individual):
         agents_to_assign = list(range(len(self.problem.forklifts)))
         index = 0
         while len(products_to_assign) > 0:
-            # Choose where to separete the genome
+            # Choose where to separate the genome
             product_placed = random.choice(products_to_assign)
             self.genome[index] = product_placed
 
@@ -38,7 +38,6 @@ class IntVectorIndividual(Individual):
                 agents_to_assign.pop()
                 self.genome = np.append(self.genome, 999)
                 continue
-
 
     def swap_genes(self, other, index: int):
         aux = self.genome[index]

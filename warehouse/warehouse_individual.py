@@ -37,16 +37,12 @@ class WarehouseIndividual(IntVectorIndividual):
                 elif pairs.cell1 == self.problem.agent_search.products[gene] and pairs.cell2 == agent_current_position:
                     self.steps += pairs.value
                     agent_current_position = self.problem.agent_search.products[gene]
-                #else:
-                    #print("ERROR NO PAIR! AGENT: ", agent_current_position, " PRODUCT: ", self.problem.agent_search.products[gene])
 
         for pairs in self.problem.agent_search.pairs:
             if pairs.cell1 == agent_current_position and pairs.cell2 == self.problem.agent_search.exit:
                 self.steps += pairs.value
             elif pairs.cell2 == self.problem.agent_search.exit and pairs.cell2 == agent_current_position:
                 self.steps += pairs.value
-            #else:
-                #print("ERROR NO PAIR 2! AGENT: ", agent_current_position, " EXIT: ", self.problem.agent_search.exit)
 
         self.fitness = self.steps
 
@@ -58,8 +54,23 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def __str__(self):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
-        string += str(self.genome) + "\n\n"
+        string += "Genome: " + str(self.genome) + "\n"
         # TODO
+        agent = 0
+        for i, gene in enumerate(self.genome):
+            # Agent updater
+            if gene == 999:
+                # AND if it is not the last gene
+                if i + 1 < len(self.genome):
+                    if self.genome[i + 1] != 999 and self.genome[i + 1] is not None:
+                        agent += 1
+                        continue
+                    else:
+                        continue
+                else:
+                    continue
+            string += "Agent " + f"{agent+1}:\t" + str(gene+1) + "\n"
+
         return string
 
     def better_than(self, other: "WarehouseIndividual") -> bool:

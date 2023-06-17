@@ -1,5 +1,4 @@
 import copy
-import time
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -35,6 +34,7 @@ class Window(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 
+        self.problem_ga = None
         self.title('Genetic Algorithms')
 
         self.protocol('WM_DELETE_WINDOW', self.on_closing)
@@ -119,7 +119,7 @@ class Window(tk.Tk):
                                                     anchor="e", width=25)
         self.label_recombination_methods.grid(row=5, column=0)
 
-        recombination_methods = ['PMX', 'Recombination2', 'Recombination3']
+        recombination_methods = ['Recombination2', 'Recombination3', 'PMX']
 
         self.combo_recombination_methods = ttk.Combobox(master=self.panel_parameters, state="readonly",
                                                         values=recombination_methods, width=14)
@@ -164,6 +164,7 @@ class Window(tk.Tk):
 
         self.button_runGA = tk.Button(master=self.panel_run, text='Run GA',
                                       command=self.runGA_button_clicked)
+
         self.button_runGA.pack(side='left', padx=5)
 
         self.button_stop = tk.Button(master=self.panel_run, text='Stop',
@@ -320,10 +321,10 @@ class Window(tk.Tk):
 
         selection_method = Tournament(int(self.entry_tournament_size.get()))
         recombination_methods_index = self.combo_recombination_methods.current()
-        recombination_method = RecombinationPMX(
+        recombination_method = Recombination3(
             float(self.entry_recombination_prob.get())) if recombination_methods_index == 0 else \
             Recombination2(float(self.entry_recombination_prob.get())) if recombination_methods_index == 1 else \
-                Recombination3(float(self.entry_recombination_prob.get()))
+                RecombinationPMX(float(self.entry_recombination_prob.get()))
 
         mutation_methods_index = self.combo_mutation_methods.current()
         mutation_method = MutationInsert(
@@ -659,7 +660,6 @@ class SearchSolver(threading.Thread):
             problem = WarehouseProblemSearch(initial_state, end)
             problem.heuristic = HeuristicWarehouse(problem)
 
-
             solution = a_star_search.search(problem)
 
             if solution is not None:
@@ -671,9 +671,9 @@ class SearchSolver(threading.Thread):
                 pair.value = -1
 
             self.gui.text_problem.delete("1.0", "end")
-            self.gui.text_problem.insert(tk.END, "Running...\nPairs checked: " + str(i) + " / " + str(len(self.agent.pairs)))
+            self.gui.text_problem.insert(tk.END,
+                                         "Running...\nPairs checked: " + str(i) + " / " + str(len(self.agent.pairs)))
             self.gui.entry_status.delete(0, tk.END)
-
 
         self.gui.text_problem.delete("1.0", "end")
         self.gui.text_problem.insert(tk.END, str(self.gui.initial_state) + "\n" + str(self.gui.agent_search))
@@ -722,6 +722,6 @@ class SolutionRunner(threading.Thread):
                 else:
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO put the catched products in black
+                # TODO put the caught products in black
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
         self.gui.queue.put((None, steps, True))  # Done
