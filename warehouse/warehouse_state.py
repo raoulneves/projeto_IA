@@ -40,7 +40,7 @@ class WarehouseState(State[Action]):
         # TODO
         if self.column_forklift == self.columns - 1 \
                 or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.SHELF \
-                or self.matrix[self.line_forklift][self.column_forklift] == constants.PRODUCT:
+                or self.matrix[self.line_forklift][self.column_forklift + 1] == constants.PRODUCT:
             return False
         return True
 
@@ -57,7 +57,7 @@ class WarehouseState(State[Action]):
         # TODO
         if self.column_forklift == 0 \
                 or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.SHELF \
-                or self.matrix[self.line_forklift][self.column_forklift] == constants.PRODUCT:
+                or self.matrix[self.line_forklift][self.column_forklift - 1] == constants.PRODUCT:
             return False
         return True
 

@@ -8,7 +8,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import queue
 import threading
-
+import time
 import constants
 from agentsearch.agent import Agent
 from ga.genetic_operators.mutation2 import Mutation2
@@ -19,7 +19,6 @@ from ga.genetic_operators.recombination2 import Recombination2
 from ga.genetic_operators.recombination_pmx import RecombinationPMX
 from ga.genetic_operators.mutation_insert import MutationInsert
 from ga.genetic_algorithm_thread import GeneticAlgorithmThread
-from search_methods.astar_search import AStarSearch
 from warehouse.heuristic_warehouse import HeuristicWarehouse
 from warehouse.warehouse_agent_search import WarehouseAgentSearch, read_state_from_txt_file
 from warehouse.warehouse_experiments_factory import WarehouseExperimentsFactory
@@ -668,6 +667,7 @@ class SearchSolver(threading.Thread):
             if solution is not None:
                 self.agent.pairs[i].value = solution.cost
                 self.agent.pairs[i].solution = solution
+                #print("TYPE IS: ", type(self.agent.pairs[i].solution))
             else:
                 self.agent.pairs[i].value = -1
                 pair.value = -1
@@ -712,6 +712,7 @@ class SolutionRunner(threading.Thread):
         new_cells = []
         # Iterate over each step in the range of steps
         for step in range(steps - 1):
+            time.sleep(0.1)
             # Clear the list of new_cells for each step
             new_cells.clear()
             # Check if the thread_running flag is False and return if it is

@@ -1,3 +1,4 @@
+from itertools import permutations
 from typing import TypeVar
 import numpy as np
 import constants
@@ -47,6 +48,11 @@ class WarehouseAgentSearch(Agent):
         for i in range(len(fixed_products_pickup) - 1):
             for j in range(i + 1, len(fixed_products_pickup)):
                 self.pairs.append(Pair(fixed_products_pickup[i], fixed_products_pickup[j]))
+
+        # Creating pairs of products, PLUS REVERSE ORDER!
+        # Ignore IDE error, it works
+        for product_permutation in permutations(fixed_products_pickup, 2):
+            self.pairs.append(Pair(*product_permutation))
 
         # Products - Exit
         for p in fixed_products_pickup:

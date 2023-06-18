@@ -1,4 +1,7 @@
+import copy
+
 from ga.individual_int_vector import IntVectorIndividual
+from warehouse.cell import Cell
 
 
 class WarehouseIndividual(IntVectorIndividual):
@@ -11,86 +14,91 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def compute_fitness(self) -> float:
         # TODO
-
-        self.steps = 0
+        print(self.genome)
         self.fitness = 0
+        self.steps = 0
         agent = 0
-        #current_agent = self.path[agent]
+        self.path = [[] for _ in range(len(self.problem.agent_search.forklifts))]
+        current_agent = self.path[agent]
         agent_current_position = self.problem.agent_search.forklifts[agent]
-
         for i, gene in enumerate(self.genome):
 
             # Check if its 999
             if gene == 999:
-                # AND if it is not the last gene
-                if i+1 < len(self.genome):
-                    if self.genome[i + 1] != 999 and self.genome[i + 1] is not None:
-                        agent += 1
-                        agent_current_position = self.problem.agent_search.forklifts[agent]
-                        current_agent = self.path[agent]
-                        continue
-                    else:
-                        continue
-                else:
+                for pair in self.problem.agent_search.pairs:
+                    exit = self.problem.agent_search.exit
+                    if pair.cell1 == agent_current_position and pair.cell2 == exit:
+                        self.fitness += pair.value
+                        self.steps += pair.value
+                        current_agent.append(pair.solution)
+                # Change agent
+                agent += 1
+                agent_current_position = self.problem.agent_search.forklifts[agent]
+                current_agent = self.path[agent]
+                continue
+
+            for pair in self.problem.agent_search.pairs:
+                product = self.problem.agent_search.products[gene]
+                if pair.cell1 == agent_current_position and pair.cell2 == product:
+                    self.fitness += pair.value
+                    self.steps += pair.value
+                    current_agent.append(pair.solution)
+                    agent_current_position = product
                     continue
 
-            for pairs in self.problem.agent_search.pairs:
-                if pairs.cell1 == agent_current_position and pairs.cell2 == self.problem.agent_search.products[gene]:
-                    self.fitness += pairs.value
-                    self.steps += len(pairs.solution)
-                    current_agent.append(pairs.solution)
-                    agent_current_position = self.problem.agent_search.products[gene]
-                elif pairs.cell1 == self.problem.agent_search.products[gene] and pairs.cell2 == agent_current_position:
-                    self.fitness += pairs.value
-                    self.steps += len(pairs.solution)
-                    current_agent.append(pairs.solution)
-                    agent_current_position = self.problem.agent_search.products[gene]
+        for pair in self.problem.agent_search.pairs:
+            exit = self.problem.agent_search.exit
+            if pair.cell1 == agent_current_position and pair.cell2 == exit:
+                self.fitness += pair.value
+                self.steps += pair.value
+                current_agent.append(pair.solution)
 
-        for pairs in self.problem.agent_search.pairs:
-            if pairs.cell1 == agent_current_position and pairs.cell2 == self.problem.agent_search.exit:
-                self.fitness += pairs.value
-                self.steps += len(pairs.solution)
-                current_agent.append(pairs.solution)
-            elif pairs.cell2 == self.problem.agent_search.exit and pairs.cell2 == agent_current_position:
-                self.fitness += pairs.value
-                self.steps += len(pairs.solution)
-                current_agent.append(pairs.solution)
+        if not self.path:
+            print("WHAT THE FUCK?")
 
+        print("FITNESS: ", self.fitness)
+        print("STEPS: ", self.steps)
         return self.fitness
 
     def obtain_all_path(self):
         # TODO
 
-        forklift_path = []
+        forklift_path = [[] for _ in range(len(self.problem.agent_search.forklifts))]
         # Set starting position for each forklift, should look like this
         # forklift_path = [
         #     [Cell(line=0, column=0)],  # Initial path for forklift 1
         #     [Cell(line=1, column=1)]  # Initial path for forklift 2
         # ]
         for i, forklift in enumerate(self.problem.agent_search.forklifts):
-            forklift_path[i].append(forklift)
+            forklift_path[i].append(Cell(forklift.line, forklift.column))
 
-        for step in range(self.steps):
-            for i in range(len(forklift_path)):
-                current_forklift = forklift_path[i]
+        number_of_agents = len(self.problem.agent_search.forklifts)
 
-                #for action in self.path:
-                    #if action
-                # Determine the current step to be added to the forklift's path
-                #current_step = Cell(line=step, column=step)
+        # Iterate individual path for each forklift
+        for i in range(number_of_agents):
+            agent_path = self.path[i]
+            # Iterate each segment of the total path as a solution
+            index = 1
+            for solution in agent_path:
+                for action in solution.actions:
+                    match str(action):
+                        case "UP":
+                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line - 1, forklift_path[i][index - 1].column))
+                            index += 1
+                        case "DOWN":
+                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line + 1, forklift_path[i][index - 1].column))
+                            index += 1
+                        case "LEFT":
+                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line ,forklift_path[i][index - 1].column - 1))
+                            index += 1
+                        case "RIGHT":
+                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line ,forklift_path[i][index - 1].column + 1))
+                            index += 1
+                        case _:  # Default case
+                            print("Invalid action")
 
-                # Add the current step to the forklift's path
-                #current_forklift.append(current_step)
 
-                # Perform any necessary operations with the current_step and current_forklift
-
-                # Print the current step and the updated forklift path
-                #print(f"Step {step + 1}: Forklift {i + 1} path: {current_forklift}")
-
-        # [[Cell(4, 4), Cell(4, 3), Cell(3, 3), Cell(2, 3), Cell(1, 3), Cell(1, 3), Cell(0, 3), Cell(0, 4)]], 7
-        # [[Cell(4, 4), Cell(4, 3), Cell(3, 3), Cell(2, 3), Cell(1, 3), Cell(1, 3), Cell(0, 3), Cell(0, 4)],
-        # [Cell(4, 4), Cell(4, 3), Cell(3, 3), Cell(2, 3), Cell(1, 3), Cell(1, 3), Cell(0, 3), Cell(0, 4)]], 7
-        pass
+        return forklift_path, self.steps
 
     def __str__(self):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
@@ -109,7 +117,7 @@ class WarehouseIndividual(IntVectorIndividual):
                         continue
                 else:
                     continue
-            string += "Agent " + f"{agent+1}:\t" + str(gene+1) + "\n"
+            string += "Agent " + f"{agent + 1}:\t" + str(gene + 1) + "\n"
 
         return string
 
@@ -121,5 +129,7 @@ class WarehouseIndividual(IntVectorIndividual):
         new_instance = self.__class__(self.problem, self.num_genes)
         new_instance.genome = self.genome.copy()
         new_instance.fitness = self.fitness
+        new_instance.path = self.path
+        new_instance.steps = self.steps
         # TODO
         return new_instance
