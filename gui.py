@@ -712,7 +712,6 @@ class SolutionRunner(threading.Thread):
         new_cells = []
         # Iterate over each step in the range of steps
         for step in range(steps - 1):
-            time.sleep(0.1)
             # Clear the list of new_cells for each step
             new_cells.clear()
             # Check if the thread_running flag is False and return if it is
@@ -741,6 +740,14 @@ class SolutionRunner(threading.Thread):
                 else:
                     # Set the matrix value of old_cell to forklift
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
+
+                if new_cell.column + 1 < len(self.state.matrix[new_cell.line]):
+                    if self.state.matrix[new_cell.line][new_cell.column + 1] == constants.PRODUCT:
+                        self.state.matrix[new_cell.line][new_cell.column + 1] = constants.PRODUCT_CATCH
+
+                if new_cell.column - 1 >= 0:
+                    if self.state.matrix[new_cell.line][new_cell.column - 1] == constants.PRODUCT:
+                        self.state.matrix[new_cell.line][new_cell.column - 1] = constants.PRODUCT_CATCH
 
                 # TODO: Put the caught products in black
 

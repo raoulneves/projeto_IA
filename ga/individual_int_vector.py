@@ -24,6 +24,7 @@ class IntVectorIndividual(Individual):
         while len(products_to_assign) > 0:
             # Choose where to separate the genome
             product_placed = random.choice(products_to_assign)
+            product_placed = GeneticAlgorithm.rand.choice(products_to_assign)
             self.genome[index] = product_placed
 
             products_to_assign.remove(product_placed)
@@ -32,6 +33,7 @@ class IntVectorIndividual(Individual):
         while len(agents_to_assign) > 1:
             if GeneticAlgorithm.rand.random() < 0.8:
                 random_index = random.randrange(len(self.problem.products))
+                random_index = GeneticAlgorithm.rand.randrange(len(self.problem.products))
                 self.genome = np.insert(self.genome, random_index, 999)
                 agents_to_assign.pop()
             else:
