@@ -25,7 +25,7 @@ class Agent:
         if self.solution:
             for action in self.solution.actions:
                 action.execute(self.environment)
-            print('Solution cost: ', self.solution.cost)
+            # print('Solution cost: ', self.solution.cost)
         else:
             print('No solution to be executed')
 

@@ -744,6 +744,8 @@ class SolutionRunner(threading.Thread):
 
                 # TODO: Put the caught products in black
 
+
+
             # Put a copy of the state, step, and False flag in the GUI queue
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
         # Put None, steps, and True flag in the GUI queue to indicate completion

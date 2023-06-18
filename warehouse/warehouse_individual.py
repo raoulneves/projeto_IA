@@ -14,7 +14,6 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def compute_fitness(self) -> float:
         # TODO
-        print(self.genome)
         self.fitness = 0
         self.steps = 0
         agent = 0
@@ -56,8 +55,6 @@ class WarehouseIndividual(IntVectorIndividual):
         if not self.path:
             print("WHAT THE FUCK?")
 
-        print("FITNESS: ", self.fitness)
-        print("STEPS: ", self.steps)
         return self.fitness
 
     def obtain_all_path(self):
