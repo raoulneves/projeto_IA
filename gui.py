@@ -741,6 +741,7 @@ class SolutionRunner(threading.Thread):
                     # Set the matrix value of old_cell to forklift
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
+                # TODO: Put the caught products in black
                 if new_cell.column + 1 < len(self.state.matrix[new_cell.line]):
                     if self.state.matrix[new_cell.line][new_cell.column + 1] == constants.PRODUCT:
                         self.state.matrix[new_cell.line][new_cell.column + 1] = constants.PRODUCT_CATCH
@@ -748,10 +749,6 @@ class SolutionRunner(threading.Thread):
                 if new_cell.column - 1 >= 0:
                     if self.state.matrix[new_cell.line][new_cell.column - 1] == constants.PRODUCT:
                         self.state.matrix[new_cell.line][new_cell.column - 1] = constants.PRODUCT_CATCH
-
-                # TODO: Put the caught products in black
-
-
 
             # Put a copy of the state, step, and False flag in the GUI queue
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
