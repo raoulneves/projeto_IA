@@ -1,5 +1,7 @@
 import copy
 
+from pip._internal.utils.misc import tabulate
+
 from ga.individual_int_vector import IntVectorIndividual
 from warehouse.cell import Cell
 from warehouse.pair import Pair
@@ -18,13 +20,13 @@ class WarehouseIndividual(IntVectorIndividual):
         self.fitness = 0
         self.steps = 0
         self.path = [[] for _ in range(len(self.problem.agent_search.forklifts))]
-        #for i, pair in enumerate(self.problem.agent_search.forklifts):
+        # for i, pair in enumerate(self.problem.agent_search.forklifts):
 
         agent_position = [forklift for forklift in self.problem.agent_search.forklifts]
 
         # Start to products
         for i, gene in enumerate(self.genome):
-            print("GENOME: ", self.genome)
+            # print("GENOME: ", self.genome)
             product_id, agent_id = gene
             # print("AGENT ID: ", agent_id)
             # print("PRODUCT ID: ", product_id)
@@ -41,56 +43,11 @@ class WarehouseIndividual(IntVectorIndividual):
 
         for agent_id in range(len(self.problem.agent_search.forklifts)):
             for pair in self.problem.agent_search.pairs:
-                exit = self.problem.agent_search.exit
-                if pair.cell1 == agent_position[agent_id] and pair.cell2 == exit:
+                if pair.cell1 == agent_position[agent_id] and pair.cell2 == self.problem.agent_search.exit:
                     self.fitness += pair.value
                     self.steps += pair.value
                     self.path[agent_id].append(pair.solution)
 
-        #print("FITNESS: ", self.fitness)
-
-        """
-        self.fitness = 0
-        self.steps = 0
-        agent = 0
-        self.path = [[] for _ in range(len(self.problem.agent_search.forklifts))]
-        current_agent = self.path[agent]
-        agent_current_position = self.problem.agent_search.forklifts[agent]
-        for i, gene in enumerate(self.genome):
-
-            # Check if its 999
-            if gene == 999:
-                for pair in self.problem.agent_search.pairs:
-                    exit = self.problem.agent_search.exit
-                    if pair.cell1 == agent_current_position and pair.cell2 == exit:
-                        self.fitness += pair.value
-                        self.steps += pair.value
-                        current_agent.append(pair.solution)
-                # Change agent
-                agent += 1
-                agent_current_position = self.problem.agent_search.forklifts[agent]
-                current_agent = self.path[agent]
-                continue
-
-            for pair in self.problem.agent_search.pairs:
-                product = self.problem.agent_search.products[gene]
-                if pair.cell1 == agent_current_position and pair.cell2 == product:
-                    self.fitness += pair.value
-                    self.steps += pair.value
-                    current_agent.append(pair.solution)
-                    agent_current_position = product
-                    continue
-
-        for pair in self.problem.agent_search.pairs:
-            exit = self.problem.agent_search.exit
-            if pair.cell1 == agent_current_position and pair.cell2 == exit:
-                self.fitness += pair.value
-                self.steps += pair.value
-                current_agent.append(pair.solution)
-
-        if not self.path:
-            print("WHAT THE FUCK?")
-        """
         return self.fitness
 
     def obtain_all_path(self):
@@ -137,10 +94,58 @@ class WarehouseIndividual(IntVectorIndividual):
         return forklift_path, self.steps
 
     def __str__(self):
-        string = 'Fitness: ' + f'{self.fitness}' + '\n'
+        string = 'Fitness: ' + str(self.fitness) + '\n'
         string += "Genome: " + str(self.genome) + "\n"
         # TODO
-        return string
+
+        data = copy.deepcopy(self.genome)
+
+        for row in data:
+            for i in range(len(row)):
+                row[i] += 1
+
+        # Get the maximum agent ID
+        max_agent_id = max(row[1] for row in data)
+
+        # Initialize the columns
+        columns = [[] for _ in range(max_agent_id)]
+
+        # Populate the columns with product IDs in the order of appearance
+        for row in data:
+            product_id, agent_id = row
+            columns[agent_id - 1].append(product_id)
+
+        # Determine the maximum number of products in a column
+        max_products = max(len(column) for column in columns)
+
+        # Determine the maximum number of digits in product IDs
+        max_digits_number = len(str(max([max(column) for column in columns])))
+
+        # Determine the maximum number of digits in the word Agent X
+        max_digits_word = len("Agent " + str(max_agent_id))
+
+        # Check which is bigger
+        max_digits = max(max_digits_number, max_digits_word)
+
+        # Build the table string
+        table = ""
+        for i in range(max_products):
+            table += "|"
+            for column in columns:
+                if i < len(column):
+                    table += f" {column[i]:{max_digits}} |"
+                else:
+                    table += " " * (max_digits + 2) + "|"
+            table += "\n"
+
+        # Add the header row
+        header = "|"
+        for i in range(1, max_agent_id + 1):
+            header += f" Agent {i} |"
+        table = f"+{'-' * ((max_digits + 3) * max_agent_id - 1)}+\n" + header + "\n" + table
+        table += f"+{'-' * ((max_digits + 3) * max_agent_id - 1)}+\n"
+
+        return string + table
 
     def better_than(self, other: "WarehouseIndividual") -> bool:
         return True if self.fitness < other.fitness else False
