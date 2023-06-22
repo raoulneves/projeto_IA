@@ -2,6 +2,7 @@ import copy
 
 from ga.individual_int_vector import IntVectorIndividual
 from warehouse.cell import Cell
+from warehouse.pair import Pair
 
 
 class WarehouseIndividual(IntVectorIndividual):
@@ -14,6 +15,41 @@ class WarehouseIndividual(IntVectorIndividual):
 
     def compute_fitness(self) -> float:
         # TODO
+        self.fitness = 0
+        self.steps = 0
+        self.path = [[] for _ in range(len(self.problem.agent_search.forklifts))]
+        #for i, pair in enumerate(self.problem.agent_search.forklifts):
+
+        agent_position = [forklift for forklift in self.problem.agent_search.forklifts]
+
+        # Start to products
+        for i, gene in enumerate(self.genome):
+            print("GENOME: ", self.genome)
+            product_id, agent_id = gene
+            # print("AGENT ID: ", agent_id)
+            # print("PRODUCT ID: ", product_id)
+
+            for pair in self.problem.agent_search.pairs:
+                product = self.problem.agent_search.products[product_id]
+                if pair.cell1 == agent_position[agent_id] and pair.cell2 == product:
+                    self.fitness += pair.value
+                    self.steps += pair.value
+                    self.path[agent_id].append(pair.solution)
+                    agent_position[agent_id] = product
+
+        # From last position to exit
+
+        for agent_id in range(len(self.problem.agent_search.forklifts)):
+            for pair in self.problem.agent_search.pairs:
+                exit = self.problem.agent_search.exit
+                if pair.cell1 == agent_position[agent_id] and pair.cell2 == exit:
+                    self.fitness += pair.value
+                    self.steps += pair.value
+                    self.path[agent_id].append(pair.solution)
+
+        #print("FITNESS: ", self.fitness)
+
+        """
         self.fitness = 0
         self.steps = 0
         agent = 0
@@ -54,7 +90,7 @@ class WarehouseIndividual(IntVectorIndividual):
 
         if not self.path:
             print("WHAT THE FUCK?")
-
+        """
         return self.fitness
 
     def obtain_all_path(self):
@@ -80,20 +116,23 @@ class WarehouseIndividual(IntVectorIndividual):
                 for action in solution.actions:
                     match str(action):
                         case "UP":
-                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line - 1, forklift_path[i][index - 1].column))
+                            forklift_path[i].append(
+                                Cell(forklift_path[i][index - 1].line - 1, forklift_path[i][index - 1].column))
                             index += 1
                         case "DOWN":
-                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line + 1, forklift_path[i][index - 1].column))
+                            forklift_path[i].append(
+                                Cell(forklift_path[i][index - 1].line + 1, forklift_path[i][index - 1].column))
                             index += 1
                         case "LEFT":
-                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line ,forklift_path[i][index - 1].column - 1))
+                            forklift_path[i].append(
+                                Cell(forklift_path[i][index - 1].line, forklift_path[i][index - 1].column - 1))
                             index += 1
                         case "RIGHT":
-                            forklift_path[i].append(Cell(forklift_path[i][index - 1].line ,forklift_path[i][index - 1].column + 1))
+                            forklift_path[i].append(
+                                Cell(forklift_path[i][index - 1].line, forklift_path[i][index - 1].column + 1))
                             index += 1
                         case _:  # Default case
                             print("Invalid action")
-
 
         return forklift_path, self.steps
 
@@ -101,21 +140,6 @@ class WarehouseIndividual(IntVectorIndividual):
         string = 'Fitness: ' + f'{self.fitness}' + '\n'
         string += "Genome: " + str(self.genome) + "\n"
         # TODO
-        agent = 0
-        for i, gene in enumerate(self.genome):
-            # Agent updater
-            if gene == 999:
-                # AND if it is not the last gene
-                if i + 1 < len(self.genome):
-                    if self.genome[i + 1] != 999 and self.genome[i + 1] is not None:
-                        agent += 1
-                        continue
-                    else:
-                        continue
-                else:
-                    continue
-            string += "Agent " + f"{agent + 1}:\t" + str(gene + 1) + "\n"
-
         return string
 
     def better_than(self, other: "WarehouseIndividual") -> bool:
