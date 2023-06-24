@@ -1,15 +1,15 @@
 import numpy as np
 
 from ga.genetic_algorithm import GeneticAlgorithm
-from ga.individual_int_vector import IntVectorIndividual
 from ga.genetic_operators.mutation import Mutation
+from ga.individual import Individual
 
 
 class Mutation3(Mutation):
     def __init__(self, probability):
         super().__init__(probability)
 
-    def mutate(self, ind: "Individual") -> None:
+    def mutate(self, ind: Individual) -> None:
         # INSERTION mutation
         num_genes = len(ind.genome)
 
