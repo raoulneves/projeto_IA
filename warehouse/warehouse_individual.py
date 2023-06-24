@@ -98,25 +98,62 @@ class WarehouseIndividual(IntVectorIndividual):
         return forklift_path, self.steps
 
     def __str__(self):
-        string = 'Fitness: ' + f'{self.fitness}' + '\n'
+        string = 'Fitness: ' + str(self.fitness) + '\n'
         string += "Genome: " + str(self.genome) + "\n"
-        # TODO
-        agent = 0
-        for i, gene in enumerate(self.genome):
-            # Agent updater
-            if gene > 900:
-                # AND if it is not the last gene
-                if i + 1 < len(self.genome):
-                    if self.genome[i + 1] < 900 and self.genome[i + 1] is not None:
-                        agent += 1
-                        continue
-                    else:
-                        continue
-                else:
-                    continue
-            string += "Agent " + f"{agent + 1}:\t" + str(gene + 1) + "\n"
 
-        return string
+        data = self.genome.tolist()  # Convert the genome to a Python list
+
+        # Get the maximum agent ID
+        max_agent_id = 1
+        for data_point in data:
+            if data_point > 900:
+                max_agent_id += 1
+
+        # Initialize the columns
+        columns = [[] for _ in range(max_agent_id)]
+
+        # Populate the columns with product IDs in the order of appearance
+        agent_id = 0
+        for data_point in data:
+            if data_point > 900:
+                agent_id += 1
+                continue
+            columns[agent_id].append(data_point)
+
+        # Determine the maximum number of products in a column
+        max_products = max(len(column) for column in columns)
+
+        # Determine the maximum number of digits in product IDs
+        max_digits_number = 0
+        for column in columns:
+            if column:
+                max_digits_number = max(max_digits_number, len(str(max(column))))
+
+        # Determine the maximum number of digits in the word Agent X
+        max_digits_word = len("Agent " + str(max_agent_id))
+
+        # Check which is bigger
+        max_digits = max(max_digits_number, max_digits_word)
+
+        # Build the table string
+        table = ""
+        for i in range(max_products):
+            table += "|"
+            for column in columns:
+                if i < len(column):
+                    table += f" {column[i]:{max_digits-1}} |"
+                else:
+                    table += " " * (max_digits + 1) + "|"
+            table += "\n"
+
+        # Add the header row
+        header = "|"
+        for i in range(1, max_agent_id + 1):
+            header += f"Agent {i} |"
+        table = f"+{'-' * ((max_digits + 2) * max_agent_id - 1)}+\n" + header + "\n" + table
+        table += f"+{'-' * ((max_digits + 2) * max_agent_id - 1)}+\n"
+
+        return string + table
 
     def better_than(self, other: "WarehouseIndividual") -> bool:
         return True if self.fitness < other.fitness else False
