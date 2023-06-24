@@ -23,7 +23,7 @@ class WarehouseIndividual(IntVectorIndividual):
         for i, gene in enumerate(self.genome):
 
             # Check if its 999
-            if gene == 999:
+            if gene > 900:
                 for pair in self.problem.agent_search.pairs:
                     exit = self.problem.agent_search.exit
                     if pair.cell1 == agent_current_position and pair.cell2 == exit:
@@ -104,10 +104,10 @@ class WarehouseIndividual(IntVectorIndividual):
         agent = 0
         for i, gene in enumerate(self.genome):
             # Agent updater
-            if gene == 999:
+            if gene > 900:
                 # AND if it is not the last gene
                 if i + 1 < len(self.genome):
-                    if self.genome[i + 1] != 999 and self.genome[i + 1] is not None:
+                    if self.genome[i + 1] < 900 and self.genome[i + 1] is not None:
                         agent += 1
                         continue
                     else:

@@ -321,9 +321,9 @@ class Window(tk.Tk):
 
         selection_method = Tournament(int(self.entry_tournament_size.get()))
         recombination_methods_index = self.combo_recombination_methods.current()
-        recombination_method = Recombination3(
+        recombination_method = Recombination2(
             float(self.entry_recombination_prob.get())) if recombination_methods_index == 0 else \
-            Recombination2(float(self.entry_recombination_prob.get())) if recombination_methods_index == 1 else \
+            Recombination3(float(self.entry_recombination_prob.get())) if recombination_methods_index == 1 else \
                 RecombinationPMX(float(self.entry_recombination_prob.get()))
 
         mutation_methods_index = self.combo_mutation_methods.current()
