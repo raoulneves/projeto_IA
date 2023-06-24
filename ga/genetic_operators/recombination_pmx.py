@@ -22,7 +22,7 @@ class RecombinationPMX(Recombination):
 
         # Create the first child by copying the selected segment from ind1
         # and filling in the remaining genes from ind2
-        child1 = [[i, -1] for i in range(len(ind1.genome))]
+        child1 = [[-1, -1] for i in range(len(ind1.genome))]
         for i in range(cut1, cut2 + 1):
             child1[i][1] = ind1.genome[i][1]
         for i in range(len(ind1.genome)):
@@ -34,7 +34,7 @@ class RecombinationPMX(Recombination):
 
         # Create the second child by copying the selected segment from ind2
         # and filling in the remaining genes from ind1
-        child2 = [[i , -1] for i in range(len(ind1.genome))]
+        child2 = [[-1, -1] for i in range(len(ind1.genome))]
         for i in range(cut1, cut2 + 1):
             child2[i][1] = ind2.genome[i][1]
         for i in range(len(ind1.genome)):
@@ -45,7 +45,9 @@ class RecombinationPMX(Recombination):
                 child2[i][1] = gene
 
         ind1.genome = child2
+        print("CHILD 1: ", child1)
         ind2.genome = child1
+        print("CHILD 2: ", child2)
 
     def __str__(self):
         return "PMX recombination (" + f'{self.probability}' + ")"

@@ -19,5 +19,5 @@ class HeuristicWarehouse(Heuristic[WarehouseProblemSearch, WarehouseState]):
         return heuristic_value
 
     def __str__(self):
-        return "# TODO"
+        return "Manhattan distance between the forklift and the goal position"
 

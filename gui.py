@@ -741,7 +741,7 @@ class SolutionRunner(threading.Thread):
                     # Set the matrix value of old_cell to forklift
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO: Put the caught products in black
+                # TODO: Improve this so it only changes black if actually picked up a product
                 if new_cell.column + 1 < len(self.state.matrix[new_cell.line]):
                     if self.state.matrix[new_cell.line][new_cell.column + 1] == constants.PRODUCT:
                         self.state.matrix[new_cell.line][new_cell.column + 1] = constants.PRODUCT_CATCH
