@@ -44,6 +44,8 @@ class IntVectorIndividual(Individual):
                 agent_separator += 1
                 continue
 
+        self.num_genes = len(self.genome)
+
     def swap_genes(self, other, index: int):
         aux = self.genome[index]
         self.genome[index] = other.genome[index]
