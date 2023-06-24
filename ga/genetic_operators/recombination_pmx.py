@@ -45,9 +45,7 @@ class RecombinationPMX(Recombination):
                 child2[i] = gene
 
         ind1.genome = child2
-        print("child1: ", child1)
         ind2.genome = child1
-        print("child2: ", child2)
 
     def __str__(self):
         return "PMX recombination (" + f'{self.probability}' + ")"
